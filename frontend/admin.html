@@ -762,9 +762,9 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">All Users</h3>
-            <button class="btn btn-primary" onclick="openUserModal()">
+            <!-- <button class="btn btn-primary" onclick="openUserModal()">
               <i class="fas fa-plus"></i> Add User
-            </button>
+            </button> -->
           </div>
           <div class="card-body">
             <div class="table-container">
@@ -882,9 +882,10 @@
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="packageImage">Image URL</label>
-            <input type="url" id="packageImage" name="image_url" class="form-input" required 
-                   placeholder="https://example.com/images/package.jpg">
+            <label class="form-label" for="packageImageFile">Package Image</label>
+            <input type="file" id="packageImageFile" name="image_file" class="form-input" accept="image/*" required>
+            <input type="hidden" id="packageImageUrl" name="image_url">
+            <div id="imageUploadStatus" style="margin-top: 0.5rem; color: var(--text-light);"></div>
           </div>
         </form>
       </div>
@@ -1004,6 +1005,7 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
     // Toast Notification System
     function showToast(message, type = 'success') {
@@ -1154,56 +1156,85 @@
       document.getElementById('userModal').classList.remove('active');
     }
 
+    // Supabase config
+    const supabase = window.supabase.createClient(
+      'https://ksvyomylczzsvmehitmk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzdnlvbXlsY3p6c3ZtZWhpdG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxODUyNzIsImV4cCI6MjA3MDc2MTI3Mn0.1lbyAVgOdcguY9XDWybW9CwwyiUkzBO4o1b65Jk7F1I'
+    );
+
+    // Handle image upload to Supabase
+    async function handleImageUpload(file) {
+      const statusDiv = document.getElementById('imageUploadStatus');
+      statusDiv.textContent = 'Uploading image...';
+      const filePath = `${Date.now()}_${file.name}`;
+      const { data, error } = await supabase.storage.from('images').upload(filePath, file);
+      if (error) {
+        statusDiv.textContent = 'Upload failed: ' + error.message;
+        return null;
+      }
+      const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(filePath);
+      statusDiv.textContent = 'Image uploaded!';
+      return publicUrlData.publicUrl;
+    }
+
+    // Listen for file input change and upload image
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.getElementById('packageImageFile');
+      if (fileInput) {
+        fileInput.addEventListener('change', async function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const url = await handleImageUpload(file);
+            if (url) {
+              document.getElementById('packageImageUrl').value = url;
+            }
+          }
+        });
+      }
+    });
+
     // Package Form Submission
     async function handlePackageSubmit(e) {
       e.preventDefault();
-      
       const token = localStorage.getItem('island_trails_token');
-      if (!token) {
-        const alert = document.getElementById('packageAlert');
-        alert.innerHTML = `
-          <div class="alert alert-error">
-            <i class="fas fa-exclamation-circle"></i> Not authenticated. Please login again.
-          </div>
-        `;
-        return;
-      }
-      
-      const form = e.target;
       const alert = document.getElementById('packageAlert');
       const submitBtn = document.getElementById('packageSubmitBtn');
-      
-      // Clear previous alerts
       alert.innerHTML = '';
-      
-      // Get mode and ID from button attributes
+      if (!token) {
+        alert.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Not authenticated. Please login again.</div>`;
+        return;
+      }
+      const form = e.target;
       const mode = submitBtn.getAttribute('data-mode') || 'create';
       const packageId = submitBtn.getAttribute('data-id');
-      
-      // Disable submit button
       submitBtn.disabled = true;
       if (mode === 'edit') {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
       } else {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       }
-      
+
+      // Use the hidden input for image_url
+      const imageUrl = form.image_url.value.trim();
+      if (!imageUrl) {
+        alert.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please upload an image before submitting.</div>`;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = mode === 'edit' ? '<i class="fas fa-save"></i> Update Package' : '<i class="fas fa-save"></i> Create Package';
+        return;
+      }
+
       const formData = {
         title: form.title.value.trim(),
         description: form.description.value.trim(),
         price: parseFloat(form.price.value),
         duration: form.duration.value.trim(),
-        image_url: form.image_url.value.trim()
+        image_url: imageUrl
       };
-      
-      // Add ID for update operations
       if (mode === 'edit' && packageId) {
         formData.id = parseInt(packageId);
       }
-      
       try {
         let endpoint, method;
-        
         if (mode === 'edit') {
           endpoint = 'http://localhost:8000/island-trails/packages/package/update';
           method = 'POST';
@@ -1211,10 +1242,6 @@
           endpoint = 'http://localhost:8000/island-trails/packages/package/create';
           method = 'POST';
         }
-        
-        console.log(`Making ${method} request to:`, endpoint);
-        console.log('Payload:', formData);
-        
         const response = await fetch(endpoint, {
           method: method,
           headers: {
@@ -1223,46 +1250,21 @@
           },
           body: JSON.stringify(formData)
         });
-        
         const data = await response.json();
-        console.log('Response:', data);
-        
         if (data.status === 'success') {
-          alert.innerHTML = `
-            <div class="alert alert-success">
-              <i class="fas fa-check-circle"></i> ${data.message || (mode === 'edit' ? 'Package updated successfully!' : 'Package created successfully!')}
-            </div>
-          `;
-          
-          // Reset form
+          alert.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> ${data.message || (mode === 'edit' ? 'Package updated successfully!' : 'Package created successfully!')}</div>`;
           form.reset();
-          
-          // Reload packages table
+          document.getElementById('imageUploadStatus').textContent = '';
           loadPackages();
-          
-          // Close modal after 2 seconds
-          setTimeout(() => {
-            closePackageModal();
-          }, 2000);
+          setTimeout(() => { closePackageModal(); }, 2000);
         } else {
           throw new Error(data.message || `Failed to ${mode} package`);
         }
-        
       } catch (error) {
-        console.error(`Error ${mode === 'edit' ? 'updating' : 'creating'} package:`, error);
-        alert.innerHTML = `
-          <div class="alert alert-error">
-            <i class="fas fa-exclamation-circle"></i> ${error.message || `An error occurred while ${mode === 'edit' ? 'updating' : 'creating'} the package`}
-          </div>
-        `;
+        alert.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${error.message || `An error occurred while ${mode === 'edit' ? 'updating' : 'creating'} the package`}</div>`;
       } finally {
-        // Re-enable submit button
         submitBtn.disabled = false;
-        if (mode === 'edit') {
-          submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Package';
-        } else {
-          submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Package';
-        }
+        submitBtn.innerHTML = mode === 'edit' ? '<i class="fas fa-save"></i> Update Package' : '<i class="fas fa-save"></i> Create Package';
       }
     }
 
@@ -1496,9 +1498,7 @@
                 <button class="action-btn" onclick="viewUser(${user.id})" title="View User Details">
                   <i class="fas fa-eye"></i>
                 </button>
-                <button class="action-btn" onclick="editUser(${user.id})" title="Edit User">
-                  <i class="fas fa-edit"></i>
-                </button>
+                
                 <button class="action-btn delete" onclick="deleteUser(${user.id})" title="Delete User">
                   <i class="fas fa-trash"></i>
                 </button>
@@ -2253,7 +2253,7 @@
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+        //island1234
         const data = await response.json();
         console.log('User details response:', data);
         
@@ -2364,15 +2364,36 @@
       }
     }
 
-    function editUser(id) {
-      console.log('Edit user:', id);
-      // Will be implemented when edit API is provided
+    function openUserModal() {
+      document.getElementById('userModal').classList.add('active');
     }
 
-    function deleteUser(id) {
-      if (confirm('Are you sure you want to delete this user?')) {
-        console.log('Delete user:', id);
-        // Will be implemented when delete API is provided
+    async function deleteUser(id) {
+      if (!confirm('Are you sure you want to delete this user?')) return;
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        showToast('Authentication required. Please login again.', 'error');
+        return;
+      }
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/auth/user/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ id: parseInt(id) })
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          showToast('User deleted successfully', 'success');
+          loadUsers(); // Refresh the users list if such a function exists
+        } else {
+          showToast(result.message || 'Failed to delete user', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        showToast('Failed to delete user. Please try again.', 'error');
       }
     }
 

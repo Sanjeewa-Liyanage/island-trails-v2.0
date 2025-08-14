@@ -11,6 +11,7 @@ class UserApi extends ApiResourceBase{
         "login" => ["customer", "admin", null],
         "readAll" => ["admin"],
         "read" => ["admin"],
+        "delete" => ["admin"],
     ]);
    }
 
@@ -33,6 +34,34 @@ class UserApi extends ApiResourceBase{
             return ['status' => 'success', 'message' => 'User created successfully.'];
         } else {
             return ['status' => 'error', 'message' => 'Failed to create user.'];
+        }
+   }
+   public function delete($data){
+    $user = $this->getAuthenticatedUser();
+        if (!$user) {
+            return [
+                "message" => "Invalid or expired token. Please log in again.",
+                "status" => "error"
+            ];
+        }
+
+        if(!$this->checkRoles($user['role'], 'delete')){
+            return [
+                "message" => "Unauthorized: Admin access required",
+                "status" => "error",
+            ];
+        }
+
+        if (!isset($data['id'])) {
+            return ['status' => 'error', 'message' => 'User ID is required'];
+        }
+
+        $user = new User();
+        $user->id = $data['id'];
+        if ($user->delete()) {
+            return ['status' => 'success', 'message' => 'User deleted successfully.'];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to delete user.'];
         }
    }
    

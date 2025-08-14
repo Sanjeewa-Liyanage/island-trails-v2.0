@@ -34,14 +34,29 @@
     /* 1. Immersive Hero Header using the provided image */
     header {
       color: var(--text-light);
-      padding: 0 0 5rem 0; /* Increased padding for dramatic effect */
+      padding: 0 0 5rem 0;
       position: relative;
-      background: linear-gradient(rgba(44, 33, 29, 0.5), rgba(44, 33, 29, 0.3)), url('https://images.pexels.com/photos/10984543/pexels-photo-10984543.jpeg');
-      background-size: cover;
-      background-position: center;
-      min-height: 90vh; /* Make the hero section taller */
+      min-height: 90vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+    }
+    .hero-bg-slideshow {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+    }
+    .hero-bg-slide {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .hero-bg-slide.active {
+      opacity: 1;
+      z-index: 1;
     }
     
     .nav {
@@ -329,13 +344,21 @@
 </head>
 <body>
   <header>
+    <div class="hero-bg-slideshow">
+      <div class="hero-bg-slide active" style="background-image:url('https://images.pexels.com/photos/13667947/pexels-photo-13667947.jpeg');"></div>
+      <div class="hero-bg-slide" style="background-image:url('https://images.pexels.com/photos/23338897/pexels-photo-23338897.jpeg');"></div>
+      <div class="hero-bg-slide" style="background-image:url('https://i.ytimg.com/vi/Lyf5ar5-qfI/maxresdefault.jpg');"></div>
+      <div class="hero-bg-slide" style="background-image:url('https://cdn.pixabay.com/photo/2017/06/29/18/37/sri-lanka-2455695_960_720.jpg');"></div>
+      <div class="hero-bg-slide" style="background-image:url('https://www.wallpaperbetter.com/wallpaper/475/335/800/elephants-at-sunset-1080P-wallpaper.jpg');"></div>
+    </div>
     <nav class="nav">
-      <div class="logo">Island Trails</div>
+      <div class="logo" style="font-family: var(--heading-font); font-size: 2.2rem; font-weight: 900; color: var(--accent-gold); letter-spacing: 1px;">IslandTrails</div>
       <ul>
         <li><a href="#explore">Explore</a></li>
         <li><a href="#aboutus">About Us</a></li>
         <li><a href="#contactus">Contact Us</a></li>
         <li><a href="login.html" id="loginBtn" style="color:#ffd700;">Login</a></li>
+        <li><a href="signup.html" id="signupBtn" style="color:#ff7b00;font-weight:700;">Signup</a></li>
       </ul>
     </nav>
     <div class="hero">
@@ -349,43 +372,29 @@
     <div class="section-title">Sri Lanka, the Pearl of the Indian Ocean</div>
     <div style="position:relative;">
       <button id="slideLeft" style="position:absolute;left:-30px;top:50%;transform:translateY(-50%);z-index:2;background:#1e3c72;color:#fff;border:none;border-radius:50%;width:38px;height:38px;font-size:1.5rem;cursor:pointer;box-shadow:0 2px 8px rgba(30,60,114,0.13);display:none;">&#8592;</button>
-      <div class="dest-slider" id="packagesSlider" style="display:flex;overflow-x:auto;gap:24px;padding-bottom:8px;scroll-behavior:smooth;">
+  <div class="dest-slider" id="packagesSlider" style="display:flex;overflow-x:auto;gap:24px;padding-bottom:8px;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;">
+  <style>
+    #packagesSlider::-webkit-scrollbar { display: none; }
+  </style>
         <!-- Cards will be loaded here by JS -->
+      </div>
+      <!-- Package Details Modal -->
+      <div id="packageDetailsModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,33,29,0.55);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;max-width:950px;width:98vw;min-width:320px;min-height:640px;max-height:98vh;border-radius:18px;box-shadow:0 16px 48px rgba(44,33,29,0.22);padding:32px 28px;overflow:auto;position:relative;display:flex;flex-direction:row;gap:32px;align-items:stretch;">
+          <div id="packageDetailsImage" style="flex:0 0 440px;max-width:440px;background:#f7fafd;display:flex;align-items:center;justify-content:center;border-radius:14px;overflow:hidden;min-height:440px;box-shadow:0 2px 12px rgba(30,60,114,0.08);padding:18px;">
+            <!-- Image will be loaded here -->
+          </div>
+          <div style="flex:1;min-width:220px;display:flex;flex-direction:column;justify-content:center;background:#fcfcfc;border-radius:14px;padding:38px 32px 32px 32px;box-shadow:0 2px 12px rgba(30,60,114,0.06);position:relative;">
+            <button onclick="closePackageDetailsModal()" style="position:absolute;top:18px;right:22px;background:none;border:none;font-size:2.2rem;color:#1e3c72;cursor:pointer;">&times;</button>
+            <div id="packageDetailsContent"></div>
+          </div>
+        </div>
       </div>
       <button id="slideRight" style="position:absolute;right:-30px;top:50%;transform:translateY(-50%);z-index:2;background:#1e3c72;color:#fff;border:none;border-radius:50%;width:38px;height:38px;font-size:1.5rem;cursor:pointer;box-shadow:0 2px 8px rgba(30,60,114,0.13);display:none;">&#8594;</button>
     </div>
   </section>
 
-  <section class="events-section">
-    <div class="section-title" style="color: var(--dark-background);">Unforgettable Experiences</div>
-    <div class="events-slider">
-      <!-- These cards now use the same structure as destination cards for consistency -->
-      <div class="event-card">
-        <img src="https://images.unsplash.com/photo-1560053932-1487803983bb?auto=format&fit=crop&w=600&q=80" alt="Kandy Esala Perahera festival">
-        <div class="dest-card-content">
-          <div class="dest-card-title">Kandy Esala Perahera</div>
-          <div class="dest-card-desc">Witness Sri Lanka's grandest cultural festival with elephants and dancers.</div>
-          <div class="dest-card-price">From $60</div>
-        </div>
-      </div>
-      <div class="event-card">
-        <img src="https://images.unsplash.com/photo-1582967527945-314e32d56a73?auto=format&fit=crop&w=600&q=80" alt="Stilt fishing in Sri Lanka">
-        <div class="dest-card-content">
-          <div class="dest-card-title">Coastal Fishing Traditions</div>
-          <div class="dest-card-desc">Observe the unique and timeless practice of stilt fishing at sunset.</div>
-          <div class="dest-card-price">From $40</div>
-        </div>
-      </div>
-      <div class="event-card">
-        <img src="https://images.unsplash.com/photo-1597778593399-28153f3e5b31?auto=format&fit=crop&w=600&q=80" alt="Leopard in Yala National Park">
-        <div class="dest-card-content">
-          <div class="dest-card-title">Yala National Park Safari</div>
-          <div class="dest-card-desc">Seek out leopards and wild beauty on a thrilling safari adventure.</div>
-          <div class="dest-card-price">From $110</div>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <section class="section testimonials-section">
     <div class="section-title">Stories from Our Travellers</div>
@@ -422,17 +431,7 @@
       </div>
     </div>
   </section>
-
-  <section class="cta-section">
-    <h2>Begin Your Unforgettable Journey</h2>
-    <p>Let us craft your perfect Sri Lankan adventure. Discover ancient wonders, pristine beaches, and a culture rich with warmth and hospitality. Your story begins here.</p>
-    <button onclick="window.location.href='signup.html'">Start Planning Today</button>
-  </section>
-
-  <footer class="footer">
-    &copy; 2025 Island Trails. All rights reserved. | <a href="mailto:info@islandtrails.com" style="color:#ffd700;">info@islandtrails.com</a>
-  </footer>
-  <section class="section" id="aboutus" style="margin-top:0;">
+   <section class="section" id="aboutus" style="margin-top:0;">
     <div class="section-title">About Us</div>
     <div style="max-width:800px;margin:0 auto;font-size:1.1rem;color:#1e3c72;text-align:center;line-height:1.7;">
       Island Trails is your trusted travel partner for discovering the wonders of Sri Lanka. With years of experience, our passionate team curates unique travel experiences, from ancient cities and lush tea plantations to golden beaches and vibrant festivals. We believe in responsible tourism, authentic adventures, and making every journey unforgettable. Join us and explore the Pearl of the Indian Ocean with confidence and joy!
@@ -465,7 +464,54 @@
     </div>
   </section>
 
+  <section class="cta-section">
+    <h2>Begin Your Unforgettable Journey</h2>
+    <p>Let us craft your perfect Sri Lankan adventure. Discover ancient wonders, pristine beaches, and a culture rich with warmth and hospitality. Your story begins here.</p>
+    <button onclick="window.location.href='signup.html'">Start Planning Today</button>
+  </section>
+
+  <footer class="footer">
+    &copy; 2025 Island Trails. All rights reserved. | <a href="mailto:info@islandtrails.com" style="color:#ffd700;">info@islandtrails.com</a>
+  </footer>
+ 
+  <!-- Booking Date Modal -->
+  <div id="bookingDateModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,33,29,0.7);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:#fff;max-width:450px;width:90vw;border-radius:16px;box-shadow:0 16px 48px rgba(44,33,29,0.3);padding:32px;position:relative;">
+      <button onclick="closeBookingDateModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:2rem;color:#999;cursor:pointer;line-height:1;">&times;</button>
+      
+      <div style="text-align:center;margin-bottom:24px;">
+        <h3 style="color:#1e3c72;font-size:1.5rem;margin:0 0 8px 0;font-family:var(--heading-font);">Select Booking Date</h3>
+        <p style="color:#666;margin:0;font-size:0.95rem;">Choose your preferred travel date for this package</p>
+      </div>
+      
+      <div id="selectedPackageInfo" style="background:#f8f9fa;padding:16px;border-radius:8px;margin-bottom:20px;border-left:4px solid var(--accent-gold);">
+        <!-- Package info will be populated here -->
+      </div>
+      
+      <div style="margin-bottom:24px;">
+        <label for="bookingDateInput" style="display:block;margin-bottom:8px;color:#333;font-weight:600;">Travel Date:</label>
+        <input type="date" id="bookingDateInput" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:1rem;box-sizing:border-box;" required>
+        <small style="color:#666;font-size:0.85rem;display:block;margin-top:6px;">Please select a date in the future</small>
+      </div>
+      
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button onclick="closeBookingDateModal()" style="padding:12px 24px;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;">Cancel</button>
+        <button onclick="confirmBooking()" style="padding:12px 24px;background:var(--accent-gold);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:600;">Book Now</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Hero background slideshow
+    document.addEventListener('DOMContentLoaded', function() {
+      const slides = document.querySelectorAll('.hero-bg-slide');
+      let idx = 0;
+      setInterval(() => {
+        slides[idx].classList.remove('active');
+        idx = (idx + 1) % slides.length;
+        slides[idx].classList.add('active');
+      }, 4200);
+    });
     // Fetch and display packages as slider
     async function loadPackages() {
       const slider = document.getElementById('packagesSlider');
@@ -473,7 +519,6 @@
       try {
         const res = await fetch('http://localhost:8000/island-trails/packages/package/readAll');
         const data = await res.json();
-        console.log('Packages API response:', data);
         if (Array.isArray(data.data) && data.data.length > 0) {
           slider.innerHTML = '';
           data.data.forEach(pkg => {
@@ -482,17 +527,44 @@
             card.style.minWidth = '280px';
             card.style.maxWidth = '320px';
             card.style.flex = '0 0 auto';
+            card.style.cursor = 'pointer';
+            card.onclick = () => showPackageDetails(pkg.id);
+            let bookNowBtn = '';
+            // Only show Book Now if logged in as customer
+            const token = localStorage.getItem('island_trails_token');
+            const userRole = localStorage.getItem('user_role');
+            if (token && userRole && userRole.toLowerCase() === 'customer') {
+              bookNowBtn = `<button class="book-now-btn" data-pkgid="${pkg.id}" style="margin-top:16px;width:100%;padding:10px 0;background:linear-gradient(90deg,#ff7b00 60%,#ffb347 100%);color:#fff;border:none;border-radius:7px;font-size:1.08rem;font-weight:700;cursor:pointer;transition:background 0.2s;">Book Now</button>`;
+            }
             card.innerHTML = `
               <img src="${pkg.image_url || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'}" alt="${pkg.title}">
               <div class="dest-card-content">
                 <div class="dest-card-title">${pkg.title || 'Untitled Package'}</div>
                 <div class="dest-card-desc">${pkg.description ? pkg.description.substring(0, 90) + (pkg.description.length > 90 ? '...' : '') : 'No description.'}</div>
-                <div class="dest-card-price">From $${pkg.price || 'N/A'}</div>
+                <div class="dest-card-price">From LKR ${pkg.price || 'N/A'}</div>
+                ${bookNowBtn}
               </div>
             `;
             slider.appendChild(card);
           });
-          // Show/hide arrows
+          // Add event listeners for Book Now buttons
+          document.querySelectorAll('.book-now-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+              e.stopPropagation();
+              const pkgId = this.getAttribute('data-pkgid');
+              const token = localStorage.getItem('island_trails_token');
+              if (!token) {
+                alert('You must be logged in as a customer to book.');
+                return;
+              }
+              
+              // Find the package data for the modal
+              const packageData = data.data.find(pkg => pkg.id == pkgId);
+              if (packageData) {
+                showBookingDateModal(packageData);
+              }
+            });
+          });
           document.getElementById('slideLeft').style.display = 'block';
           document.getElementById('slideRight').style.display = 'block';
         } else {
@@ -502,8 +574,149 @@
         slider.innerHTML = '<div style="color:#c00;">Failed to load packages.</div>';
       }
     }
+
+    async function showPackageDetails(packageId) {
+      const modal = document.getElementById('packageDetailsModal');
+      const content = document.getElementById('packageDetailsContent');
+      const imageDiv = document.getElementById('packageDetailsImage');
+      content.innerHTML = '<div style="text-align:center;padding:32px 0;">Loading...</div>';
+      imageDiv.innerHTML = '';
+      modal.style.display = 'flex';
+      try {
+        const res = await fetch('http://localhost:8000/island-trails/packages/package/read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: packageId })
+        });
+        const data = await res.json();
+        if (data.status === 'success' && data.data) {
+          const pkg = data.data;
+          imageDiv.innerHTML = `<img src="${pkg.image_url || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'}" alt="${pkg.title}" style="width:100%;height:400px;max-width:400px;object-fit:cover;border-radius:12px;box-shadow:0 4px 18px rgba(44,33,29,0.13);">`;
+          content.innerHTML = `
+            <div style="font-size:2.2rem;font-weight:900;color:#1e3c72;margin-bottom:18px;line-height:1.1;letter-spacing:-1px;">${pkg.title}</div>
+            <div style="color:#444;font-size:1.18rem;margin-bottom:26px;line-height:1.7;max-height:340px;min-height:120px;overflow:auto;">${pkg.description}</div>
+            <div style="display:flex;gap:32px;margin-bottom:28px;align-items:center;">
+              <div style="background:#fff7e6;padding:18px 32px;border-radius:12px;box-shadow:0 1px 4px rgba(255,123,0,0.08);font-size:1.18rem;min-width:120px;text-align:center;border:1.5px solid #ffe0b2;">
+                <span style="color:#ff7b00;font-weight:700;">Price</span><br>
+                <span style="font-size:1.35rem;font-weight:900;">LKR ${pkg.price}</span>
+              </div>
+              <div style="background:#eaf2fb;padding:18px 32px;border-radius:12px;box-shadow:0 1px 4px rgba(30,60,114,0.06);font-size:1.18rem;min-width:120px;text-align:center;border:1.5px solid #b3c6e0;">
+                <span style="color:#2563eb;font-weight:700;">Duration</span><br>
+                <span style="font-size:1.22rem;font-weight:900;">${pkg.duration}</span>
+              </div>
+            </div>
+            <div style="font-size:1.08rem;color:#888;margin-top:10px;">Added: <span style="color:#1e3c72;font-weight:600;">${pkg.created_at}</span></div>
+          `;
+        } else {
+          content.innerHTML = '<div style="color:#c00;padding:32px 0;">Failed to load package details.</div>';
+        }
+      } catch (e) {
+        content.innerHTML = '<div style="color:#c00;padding:32px 0;">Failed to load package details.</div>';
+      }
+    }
+
+    function closePackageDetailsModal() {
+      document.getElementById('packageDetailsModal').style.display = 'none';
+    }
+
+    // Booking Date Modal Functions
+    let selectedPackageForBooking = null;
+
+    function showBookingDateModal(packageData) {
+      selectedPackageForBooking = packageData;
+      const modal = document.getElementById('bookingDateModal');
+      const packageInfo = document.getElementById('selectedPackageInfo');
+      const dateInput = document.getElementById('bookingDateInput');
+      
+      // Populate package info
+      packageInfo.innerHTML = `
+        <div style="font-weight:600;color:#1e3c72;margin-bottom:4px;">${packageData.title}</div>
+        <div style="color:#666;font-size:0.9rem;">Price: <span style="color:var(--accent-gold);font-weight:600;">LKR ${packageData.price}</span></div>
+      `;
+      
+      // Set minimum date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const minDate = tomorrow.toISOString().split('T')[0];
+      dateInput.min = minDate;
+      dateInput.value = minDate; // Default to tomorrow
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeBookingDateModal() {
+      document.getElementById('bookingDateModal').style.display = 'none';
+      selectedPackageForBooking = null;
+    }
+
+    async function confirmBooking() {
+      const dateInput = document.getElementById('bookingDateInput');
+      const selectedDate = dateInput.value;
+      
+      if (!selectedDate) {
+        alert('Please select a booking date.');
+        return;
+      }
+      
+      // Validate date is in the future
+      const selectedDateTime = new Date(selectedDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (selectedDateTime <= today) {
+        alert('Please select a future date for your booking.');
+        return;
+      }
+      
+      if (!selectedPackageForBooking) {
+        alert('Package information not found. Please try again.');
+        return;
+      }
+      
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        alert('You must be logged in to make a booking.');
+        return;
+      }
+      
+      // Disable the confirm button to prevent double-booking
+      const confirmBtn = event.target;
+      const originalText = confirmBtn.textContent;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Booking...';
+      
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ 
+            package_id: Number(selectedPackageForBooking.id), 
+            booking_date: selectedDate 
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          alert(`Booking created successfully!\n\nBooking ID: ${data.data.id}\nPackage: ${data.data.package_title}\nDate: ${selectedDate}\nStatus: ${data.data.status}.`);
+          closeBookingDateModal();
+        } else {
+          alert(data.message || 'Failed to create booking. Please try again.');
+        }
+      } catch (err) {
+        console.error('Booking error:', err);
+        alert('Network or server error. Please check your connection and try again.');
+      } finally {
+        // Re-enable the button
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
+      }
+    }
     window.addEventListener('DOMContentLoaded', loadPackages);
-    // Slider controls
+    // Slider controls and auto-scroll
     document.addEventListener('DOMContentLoaded', function() {
       const slider = document.getElementById('packagesSlider');
       document.getElementById('slideLeft').onclick = function() {
@@ -512,7 +725,34 @@
       document.getElementById('slideRight').onclick = function() {
         slider.scrollBy({ left: 320, behavior: 'smooth' });
       };
-      
+
+      // Auto-scroll (continuous, looping)
+      let autoScrollTimeout;
+      let isPaused = false;
+      const cardWidth = 320 + 24; // card width + gap (adjust if needed)
+      function slideToNextCard() {
+        if (!slider) return;
+        // If at (or near) end, go back to start after a pause
+        if (slider.scrollLeft + slider.offsetWidth >= slider.scrollWidth - 10) {
+          isPaused = true;
+          autoScrollTimeout = setTimeout(() => {
+            slider.scrollTo({ left: 0, behavior: 'smooth' });
+            setTimeout(() => {
+              isPaused = false;
+              slideToNextCard();
+            }, 800); // Pause after jump to start
+          }, 1200); // Pause at end before jumping
+        } else {
+          slider.scrollBy({ left: cardWidth, behavior: 'smooth' });
+          autoScrollTimeout = setTimeout(slideToNextCard, 1800); // Pause between cards
+        }
+      }
+      slideToNextCard();
+
+      // Pause on hover
+      slider.addEventListener('mouseenter', () => { clearTimeout(autoScrollTimeout); });
+      slider.addEventListener('mouseleave', () => { if (!isPaused) slideToNextCard(); });
+
       // Check if user is logged in and update login button
       checkLoginStatus();
     });

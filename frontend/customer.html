@@ -637,6 +637,83 @@
       box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
     }
     
+    /* Booking Edit Modal Styles */
+    #bookingEditModal .booking-edit-info {
+      background: rgba(var(--primary-rgb), 0.05);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    #bookingEditModal .booking-details-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    #bookingEditModal .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #bookingEditModal .detail-item:last-child {
+      border-bottom: none;
+    }
+
+    #bookingEditModal .label {
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    #bookingEditModal .value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #bookingEditModal .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    #bookingEditModal .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    #bookingEditModal .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    #bookingEditModal .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+
+    #bookingEditModal .form-text {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-light);
+    }
+
+    #bookingEditModal .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+    
     /* Toast Notifications */
     .toast-container {
       position: fixed;
@@ -758,10 +835,6 @@
           <i class="fas fa-calendar-check"></i>
           My Bookings
         </a>
-        <a href="#" class="nav-item" data-section="profile">
-          <i class="fas fa-user"></i>
-          Profile
-        </a>
       </nav>
       
       <div class="sidebar-footer">
@@ -838,12 +911,12 @@
           </div>
         </div>
 
-        <!-- Recent Bookings -->
+        <!-- All Bookings -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Recent Bookings</h3>
+            <h3 class="card-title">All My Bookings</h3>
             <a href="#" class="btn btn-primary btn-sm" onclick="switchSection('bookings')">
-              View All
+              Manage Bookings
             </a>
           </div>
           <div class="card-body">
@@ -899,7 +972,6 @@
                     <th>Booking ID</th>
                     <th>Package</th>
                     <th>Date</th>
-                    <th>Guests</th>
                     <th>Status</th>
                     <th>Amount</th>
                     <th>Actions</th>
@@ -907,48 +979,11 @@
                 </thead>
                 <tbody id="allBookingsTable">
                   <tr>
-                    <td colspan="7" class="text-center">Loading...</td>
+                    <td colspan="6" class="text-center">Loading...</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Profile Section -->
-      <section id="profile-section" class="section hidden">
-        <div class="page-header">
-          <h1 class="page-title">Profile</h1>
-          <p class="page-subtitle">Manage your account information</p>
-        </div>
-        
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Personal Information</h3>
-          </div>
-          <div class="card-body">
-            <form id="profileForm">
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" class="form-input" id="profileName" placeholder="Enter your full name">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-input" id="profileEmail" placeholder="Enter your email">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Phone</label>
-                <input type="tel" class="form-input" id="profilePhone" placeholder="Enter your phone number">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Address</label>
-                <input type="text" class="form-input" id="profileAddress" placeholder="Enter your address">
-              </div>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Update Profile
-              </button>
-            </form>
           </div>
         </div>
       </section>
@@ -1022,6 +1057,34 @@ Note: Guest count and special requests will be handled during confirmation proce
           </button>
         </div>
         <button type="button" class="btn btn-secondary" onclick="closeBookingDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Edit Modal -->
+  <div class="modal" id="bookingEditModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Booking Date</h3>
+        <button class="modal-close" onclick="closeBookingEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="booking-edit-info" id="bookingEditInfo">
+          <!-- Booking info will be populated here -->
+        </div>
+        <form id="bookingEditForm" onsubmit="submitBookingEdit(event)">
+          <div class="form-group">
+            <label for="editBookingDate">Select New Booking Date:</label>
+            <input type="date" id="editBookingDate" class="form-control" required>
+            <small class="form-text">Note: Only the booking date can be changed. Other details are for reference only.</small>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary" style="background: var(--primary); border: none;">
+              <i class="fas fa-save"></i> Update Booking
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeBookingEditModal()">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -1142,6 +1205,15 @@ Note: Guest count and special requests will be handled during confirmation proce
           const targetSection = document.getElementById(sectionId);
           if (targetSection) {
             targetSection.classList.remove('hidden');
+            
+            // Load data when switching to specific sections
+            if (item.dataset.section === 'packages') {
+              loadPackages();
+            } else if (item.dataset.section === 'bookings') {
+              loadBookings();
+            } else if (item.dataset.section === 'dashboard') {
+              loadDashboardData();
+            }
           }
         });
       });
@@ -1163,11 +1235,22 @@ Note: Guest count and special requests will be handled during confirmation proce
       if (targetNav && targetSection) {
         targetNav.classList.add('active');
         targetSection.classList.remove('hidden');
+        
+        // Load data when switching to specific sections
+        if (sectionName === 'packages') {
+          loadPackages();
+        } else if (sectionName === 'bookings') {
+          loadBookings();
+        } else if (sectionName === 'dashboard') {
+          loadDashboardData();
+        }
       }
     }
 
     // Load dashboard data
     async function loadDashboardData() {
+      const token = localStorage.getItem('island_trails_token');
+      
       try {
         // Load packages count
         const packagesResponse = await fetch('http://localhost:8000/island-trails/packages/package/readAll');
@@ -1177,22 +1260,42 @@ Note: Guest count and special requests will be handled during confirmation proce
           document.getElementById('totalPackages').textContent = packagesData.data.length;
         }
         
+        // Fetch user bookings from API
+        let allBookings = [];
+        if (token) {
+          try {
+            const bookingsResponse = await fetch('http://localhost:8000/island-trails/bookings/booking/readUserBookings', {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            const bookingsResult = await bookingsResponse.json();
+            
+            if (bookingsResult.status === 'success' && Array.isArray(bookingsResult.data)) {
+              allBookings = bookingsResult.data;
+            }
+          } catch (bookingError) {
+            console.error('Error fetching bookings:', bookingError);
+          }
+        }
+        
         // Update booking statistics
-        const totalBookings = userBookings.length;
+        const totalBookings = allBookings.length;
         document.getElementById('totalBookings').textContent = totalBookings;
         
         // Calculate total spent
-        const totalSpent = userBookings.reduce((sum, booking) => {
+        const totalSpent = allBookings.reduce((sum, booking) => {
           return sum + parseFloat(booking.package_price || 0);
         }, 0);
-        document.getElementById('totalSpent').textContent = `$${totalSpent.toLocaleString()}`;
+        document.getElementById('totalSpent').textContent = `LKR ${totalSpent.toLocaleString()}`;
         
-        // Load recent bookings table
+        // Load ALL bookings in dashboard table (not just recent)
         const recentTable = document.getElementById('recentBookingsTable');
-        if (userBookings.length > 0) {
-          // Show most recent 3 bookings
-          const recentBookings = userBookings.slice(-3).reverse();
-          recentTable.innerHTML = recentBookings.map(booking => {
+        if (allBookings.length > 0) {
+          // Show all bookings, sorted by date (most recent first)
+          const sortedBookings = allBookings.sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date));
+          recentTable.innerHTML = sortedBookings.map(booking => {
             const bookingDate = new Date(booking.booking_date).toLocaleDateString();
             const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
                                booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
@@ -1202,7 +1305,7 @@ Note: Guest count and special requests will be handled during confirmation proce
                 <td>${booking.package_title}</td>
                 <td>${bookingDate}</td>
                 <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
-                <td>$${parseFloat(booking.package_price).toLocaleString()}</td>
+                <td>LKR ${parseFloat(booking.package_price).toLocaleString()}</td>
               </tr>
             `;
           }).join('');
@@ -1221,7 +1324,16 @@ Note: Guest count and special requests will be handled during confirmation proce
         // Show error state
         document.getElementById('totalPackages').textContent = '0';
         document.getElementById('totalBookings').textContent = '0';
-        document.getElementById('totalSpent').textContent = '$0';
+        document.getElementById('totalSpent').textContent = 'LKR 0';
+        
+        const recentTable = document.getElementById('recentBookingsTable');
+        recentTable.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center" style="color: var(--error);">
+              Failed to load booking data. Please try again later.
+            </td>
+          </tr>
+        `;
       }
     }
 
@@ -1247,7 +1359,7 @@ Note: Guest count and special requests will be handled during confirmation proce
                 <p class="package-description">${pkg.description || 'No description available.'}</p>
                 <div class="package-footer">
                   <div>
-                    <div class="package-price">$${pkg.price || 'N/A'}</div>
+                    <div class="package-price">LKR ${pkg.price || 'N/A'}</div>
                     <div class="package-duration">${pkg.duration || 'Duration not specified'}</div>
                   </div>
                   <button class="btn btn-primary btn-sm" onclick="openBookingModal(${pkg.id}, '${pkg.title}', ${pkg.price})">
@@ -1270,43 +1382,57 @@ Note: Guest count and special requests will be handled during confirmation proce
     // Load bookings
     async function loadBookings() {
       const table = document.getElementById('allBookingsTable');
-      
-      if (userBookings.length > 0) {
-        table.innerHTML = userBookings.map(booking => {
-          const bookingDate = new Date(booking.booking_date).toLocaleDateString();
-          const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
-                             booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
-          
-          return `
-            <tr>
-              <td>BK${String(booking.id).padStart(3, '0')}</td>
-              <td>${booking.package_title}</td>
-              <td>${bookingDate}</td>
-              <td>1</td>
-              <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
-              <td>$${parseFloat(booking.package_price).toLocaleString()}</td>
-              <td>
-                <button class="btn btn-secondary btn-sm" onclick="viewBooking(${booking.id})" title="View Details">
-                  <i class="fas fa-eye"></i> View
-                </button>
-                ${booking.status === 'pending' ? `
-                  <button class="btn btn-warning btn-sm" onclick="editBooking(${booking.id})" title="Edit Booking">
-                    <i class="fas fa-edit"></i> Edit
+      const token = localStorage.getItem('island_trails_token');
+      table.innerHTML = `<tr><td colspan="6" class="text-center">Loading...</td></tr>`;
+      if (!token) {
+        table.innerHTML = `<tr><td colspan="6" class="text-center" style="color: var(--error);">Authentication required. Please login again.</td></tr>`;
+        return;
+      }
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/readUserBookings', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const result = await response.json();
+        if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
+          table.innerHTML = result.data.map(booking => {
+            const bookingDate = new Date(booking.booking_date).toLocaleDateString();
+            const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
+                               booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
+            return `
+              <tr>
+                <td>BK${String(booking.id).padStart(3, '0')}</td>
+                <td>${booking.package_title}</td>
+                <td>${bookingDate}</td>
+                <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
+                <td>LKR ${parseFloat(booking.package_price).toLocaleString()}</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="viewBooking(${booking.id})" title="View Details">
+                    <i class="fas fa-eye"></i> View
                   </button>
-                ` : ''}
+                  ${booking.status === 'pending' ? `
+                    <button class="btn btn-warning btn-sm" onclick="editBooking(${booking.id})" title="Edit Booking">
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                  ` : ''}
+                </td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="text-center" style="color: var(--text-light); font-style: italic; padding: 2rem;">
+                No bookings found. Browse packages to make your first booking!<br>
+                <small>Booking creation is connected to the backend API.</small>
               </td>
             </tr>
           `;
-        }).join('');
-      } else {
-        table.innerHTML = `
-          <tr>
-            <td colspan="7" class="text-center" style="color: var(--text-light); font-style: italic; padding: 2rem;">
-              No bookings found. Browse packages to make your first booking!<br>
-              <small>Booking creation is connected to the backend API.</small>
-            </td>
-          </tr>
-        `;
+        }
+      } catch (err) {
+        table.innerHTML = `<tr><td colspan="6" class="text-center" style="color: var(--error);">Failed to load bookings. Please try again later.</td></tr>`;
       }
     }
 
@@ -1322,7 +1448,7 @@ Note: Guest count and special requests will be handled during confirmation proce
       // Populate form
       document.getElementById('bookingPackageId').value = packageId;
       document.getElementById('bookingPackageName').value = packageName;
-      document.getElementById('bookingPrice').value = `$${packagePrice}`;
+      document.getElementById('bookingPrice').value = `LKR ${packagePrice}`;
       
       // Set minimum date to today
       const today = new Date().toISOString().split('T')[0];
@@ -1454,7 +1580,7 @@ Note: Guest count and special requests will be handled during confirmation proce
                     <div style="display: flex; justify-content: between; align-items: center;">
                       <span style="color: var(--text-light);">Price:</span>
                       <span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-gold);">
-                        $${parseFloat(booking.package_price).toLocaleString()}
+                        LKR ${parseFloat(booking.package_price).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -1651,8 +1777,34 @@ Note: Guest count and special requests will be handled during confirmation proce
 
     // Booking Edit Modal Functions for Customer
     function openBookingEditModal(bookingId) {
-      // For customers, we'll create a simple edit modal
-      const bookingData = userBookings.find(b => b.id === parseInt(bookingId));
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        showToast('Authentication required. Please login again.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Find booking data from the loaded bookings
+      let bookingData = null;
+      const tableRows = document.getElementById('allBookingsTable').rows;
+      
+      for (let i = 0; i < tableRows.length; i++) {
+        const row = tableRows[i];
+        const cells = row.cells;
+        if (cells && cells.length > 0) {
+          const bookingIdCell = cells[0].textContent;
+          const extractedId = bookingIdCell.replace('BK', '').replace(/^0+/, '');
+          if (parseInt(extractedId) === parseInt(bookingId)) {
+            bookingData = {
+              id: parseInt(extractedId),
+              package_title: cells[1].textContent,
+              booking_date: cells[2].textContent,
+              status: cells[4].textContent.trim()
+            };
+            break;
+          }
+        }
+      }
       
       if (!bookingData) {
         showToast('Booking not found. Please refresh the page.', 'error');
@@ -1660,44 +1812,79 @@ Note: Guest count and special requests will be handled during confirmation proce
       }
 
       // Check if booking can be edited (only pending bookings)
-      if (bookingData.status !== 'pending') {
+      if (!bookingData.status.toLowerCase().includes('pending')) {
         showToast('Only pending bookings can be edited. Please contact support for confirmed or cancelled bookings.', 'warning');
         return;
       }
 
-      const newDate = prompt(
-        `Current booking date: ${new Date(bookingData.booking_date).toLocaleDateString()}\n\nEnter new booking date (YYYY-MM-DD format):`,
-        new Date(bookingData.booking_date).toISOString().split('T')[0]
-      );
+      // Populate the edit modal
+      const bookingInfo = document.getElementById('bookingEditInfo');
+      bookingInfo.innerHTML = `
+        <div class="booking-details-grid">
+          <div class="detail-item">
+            <span class="label">Booking ID:</span>
+            <span class="value">BK${String(bookingData.id).padStart(3, '0')}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Package:</span>
+            <span class="value">${bookingData.package_title}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Current Date:</span>
+            <span class="value">${bookingData.booking_date}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Status:</span>
+            <span class="value">${bookingData.status}</span>
+          </div>
+        </div>
+      `;
 
-      if (newDate && newDate !== new Date(bookingData.booking_date).toISOString().split('T')[0]) {
-        // Validate date format
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!dateRegex.test(newDate)) {
-          showToast('Invalid date format. Please use YYYY-MM-DD format.', 'error');
-          return;
-        }
+      // Set minimum date to today
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('editBookingDate');
+      dateInput.min = today;
+      dateInput.value = today;
 
-        // Check if date is in the future
-        const selectedDate = new Date(newDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+      // Store booking ID for the form submission
+      document.getElementById('bookingEditForm').dataset.bookingId = bookingId;
 
-        if (selectedDate < today) {
-          showToast('Booking date must be in the future.', 'error');
-          return;
-        }
+      // Show the modal
+      document.getElementById('bookingEditModal').classList.add('active');
+    }
 
-        updateCustomerBooking(bookingId, newDate);
+    function closeBookingEditModal() {
+      document.getElementById('bookingEditModal').classList.remove('active');
+    }
+
+    async function submitBookingEdit(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const bookingId = form.dataset.bookingId;
+      const newDate = document.getElementById('editBookingDate').value;
+      
+      if (!newDate) {
+        showToast('Please select a booking date.', 'error');
+        return;
       }
+
+      // Validate date is in the future
+      const selectedDate = new Date(newDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        showToast('Booking date must be in the future.', 'error');
+        return;
+      }
+
+      await updateCustomerBooking(bookingId, newDate);
     }
 
     // Update customer booking
     async function updateCustomerBooking(bookingId, newDate) {
       const token = localStorage.getItem('island_trails_token');
-      
-      console.log('Token from localStorage:', token ? 'Token exists' : 'No token found');
-      console.log('Token length:', token ? token.length : 0);
       
       if (!token) {
         showToast('Authentication required. Please login again.', 'error');
@@ -1705,34 +1892,34 @@ Note: Guest count and special requests will be handled during confirmation proce
         return;
       }
 
-      const bookingData = userBookings.find(b => b.id === parseInt(bookingId));
-      
-      if (!bookingData) {
-        console.error('Booking not found in userBookings array:', bookingId);
-        console.error('Available bookings:', userBookings);
-        showToast('Booking data not found. Please refresh the page and try again.', 'error');
-        return;
-      }
-
-      console.log('Found booking data:', bookingData);
-
-      const updateData = {
-        id: parseInt(bookingId),
-        package_id: bookingData.package_id,
-        booking_date: newDate + ' 09:00:00', // Default time
-        status: bookingData.status
-      };
-
-      console.log('Customer booking update data:', updateData);
-
+      // First, get the current booking details to extract package_id
       try {
-        console.log('Sending request to:', 'http://localhost:8000/island-trails/bookings/booking/update');
-        console.log('Request headers:', {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+        const getResponse = await fetch('http://localhost:8000/island-trails/bookings/booking/readUserBookings', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
-        console.log('Request body:', JSON.stringify(updateData));
+
+        if (!getResponse.ok) {
+          throw new Error(`Failed to fetch booking details: ${getResponse.status}`);
+        }
+
+        const bookingsData = await getResponse.json();
+        const currentBooking = bookingsData.data?.find(b => b.id === parseInt(bookingId));
         
+        if (!currentBooking) {
+          showToast('Booking not found. Please refresh the page.', 'error');
+          return;
+        }
+
+        // Now update the booking with the required fields
+        const updateData = {
+          id: parseInt(bookingId),
+          package_id: currentBooking.package_id,
+          booking_date: newDate + ' 09:00:00' // Add default time
+        };
+
         const response = await fetch('http://localhost:8000/island-trails/bookings/booking/update', {
           method: 'POST',
           headers: {
@@ -1742,34 +1929,23 @@ Note: Guest count and special requests will be handled during confirmation proce
           body: JSON.stringify(updateData)
         });
 
-        console.log('Customer booking update response status:', response.status);
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Customer booking update response:', data);
 
         if (data.status === 'success') {
-          // Update local booking data
-          const bookingIndex = userBookings.findIndex(b => b.id === parseInt(bookingId));
-          if (bookingIndex !== -1) {
-            userBookings[bookingIndex] = data.data;
-          }
-
           showToast('Booking date updated successfully!', 'success');
           
-          // Refresh dashboard and bookings
-          loadDashboardData();
-          loadBookings();
-          
           // Close the edit modal
-          document.getElementById('bookingEditModal')?.classList.remove('active');
+          closeBookingEditModal();
+          
+          // Refresh bookings table
+          await loadBookings();
           
         } else {
-          console.error('Update failed:', data);
-          showToast(`Failed to update booking: ${data.message}`, 'error');
+          showToast(`Failed to update booking: ${data.message || 'Unknown error'}`, 'error');
         }
 
       } catch (error) {
@@ -1886,14 +2062,6 @@ Note: Guest count and special requests will be handled during confirmation proce
       });
     }
 
-    // Profile form submission
-    document.getElementById('profileForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Simulate profile update
-      showToast('Profile updated successfully!', 'success');
-    });
-
     // Modal click outside to close
     window.addEventListener('click', (e) => {
       const modals = document.querySelectorAll('.modal');
@@ -1906,19 +2074,29 @@ Note: Guest count and special requests will be handled during confirmation proce
 
     // Initialize everything when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('Customer dashboard initializing...');
+      
       // Check authentication
-      checkAuth();
+      const token = checkAuth();
+      if (!token) {
+        console.log('No authentication token found, redirecting to login');
+        return;
+      }
+      console.log('Authentication token found');
       
       // Load customer data
-      loadCustomerData();
+      loadCustomerData().catch(err => console.error('Error loading customer data:', err));
       
       // Initialize navigation
       initNavigation();
+      console.log('Navigation initialized');
       
       // Load initial data
-      loadDashboardData();
-      loadPackages();
-      loadBookings();
+      loadDashboardData().catch(err => console.error('Error loading dashboard data:', err));
+      loadPackages().catch(err => console.error('Error loading packages:', err));
+      loadBookings().catch(err => console.error('Error loading bookings:', err));
+      
+      console.log('Customer dashboard initialization complete');
     });
   </script>
 </body>

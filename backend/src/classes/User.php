@@ -45,7 +45,14 @@ class User extends Model{
 
 
     public function update(){}
-    public function delete(){}
+    public function delete(){
+        $conn = DatabaseConnection::getConnection();
+        $sql = "DELETE FROM users WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $this->id);
+        $success = $stmt->execute();
+        return $success;
+    }
 
     public function read(){
         $conn = DatabaseConnection::getConnection();

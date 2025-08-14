@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background: url('https://cdn.pixabay.com/photo/2018/08/21/17/56/ella-3621804_1280.jpg') no-repeat center center fixed;
+      background: url('https://wallpaperaccess.com/full/9635332.jpg') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
@@ -34,8 +34,8 @@
       -webkit-backdrop-filter: blur(10px) saturate(180%);
       border-radius: 18px;
       border: 1.5px solid rgba(255, 255, 255, 0.25);
-      padding: 36px 30px 28px 30px;
-      width: 360px;
+      padding: 48px 38px 38px 38px;
+      width: 400px;
       margin: 0 auto;
       position: relative;
       z-index: 1;
@@ -170,10 +170,13 @@
       <label for="email">Email</label>
       <input type="email" id="email" name="email" required placeholder="you@email.com">
 
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required placeholder="Password">
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required placeholder="Password">
 
-      <button type="submit">Create Account</button>
+  <label for="confirmPassword">Confirm Password</label>
+  <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm Password">
+
+  <button type="submit">Create Account</button>
     </form>
     
     <div id="message" class="message" style="display:none;"></div>
@@ -184,14 +187,35 @@
       var name = document.getElementById('name').value.trim();
       var email = document.getElementById('email').value.trim();
       var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirmPassword').value;
 
       var messageDiv = document.getElementById('message');
       messageDiv.style.display = 'none';
       messageDiv.className = 'message';
 
       // Basic validation
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !confirmPassword) {
         messageDiv.textContent = 'Please fill in all fields.';
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      // Password validation
+      if (password.length < 8) {
+        messageDiv.textContent = 'Password must be at least 8 characters long.';
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+        return;
+      }
+      if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+        messageDiv.textContent = 'Password must contain letters, numbers, and special characters.';
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+        return;
+      }
+      if (password !== confirmPassword) {
+        messageDiv.textContent = 'Passwords do not match.';
         messageDiv.classList.add('error');
         messageDiv.style.display = 'block';
         return;
@@ -211,6 +235,9 @@
         if (data.status === 'success') {
           messageDiv.textContent = data.message || 'User created successfully.';
           messageDiv.classList.add('success');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1200);
         } else {
           messageDiv.textContent = data.message || 'Failed to create user.';
           messageDiv.classList.add('error');
