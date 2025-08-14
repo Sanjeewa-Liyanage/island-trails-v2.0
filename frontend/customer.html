@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Dashboard - Island Trails</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #60a5fa;
+      --primary-dark: #1e40af;
+      --accent-gold: #ff7b00;
+      --bg: #f8fafc;
+      --sidebar: #ffffff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 1000;
+    }
+    
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--accent-gold), #e67e00);
+      color: white;
+    }
+    
+    .customer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .customer-badge i {
+      color: #fbbf24;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo i {
+      color: #fbbf24;
+    }
+    
+    .user-welcome {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 0.5rem;
+      color: white;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .user-welcome .name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.125rem;
+    }
+    
+    .user-welcome .role {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 1.5rem 0;
+    }
+    
+    .nav-item {
+      display: block;
+      padding: 0.875rem 1.5rem;
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    
+    .nav-item:hover,
+    .nav-item.active {
+      background: #f1f5f9;
+      color: var(--primary);
+      border-left-color: var(--primary);
+    }
+    
+    .nav-item i {
+      margin-right: 0.75rem;
+      width: 20px;
+    }
+    
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .logout-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--error);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+    
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      min-height: 100vh;
+    }
+    
+    .top-header {
+      background: linear-gradient(135deg, var(--accent-gold), #e67e00);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .top-header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .customer-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .customer-title h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .customer-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .customer-status .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .main-content-body {
+      padding: 2rem;
+    }
+    
+    .page-header {
+      margin-bottom: 2rem;
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+      background: var(--card);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-gold), #ff9500);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+    }
+    
+    .stat-icon.bookings {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+    
+    .stat-icon.packages {
+      background: linear-gradient(135deg, var(--accent-gold), #e67e00);
+    }
+    
+    .stat-icon.revenue {
+      background: linear-gradient(135deg, var(--success), #047857);
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      color: var(--success);
+    }
+    
+    .stat-icon.spent {
+      background: var(--success);
+    }
+    
+    .stat-content h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-content p {
+      color: var(--text-light);
+      font-size: 0.875rem;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #059669;
+    }
+    
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background: #d97706;
+    }
+    
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+    }
+    
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .table th,
+    .table td {
+      padding: 0.875rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .table tbody tr:hover {
+      background: #f8fafc;
+    }
+    
+    /* Package Grid */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .package-card {
+      background: var(--card);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .package-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .package-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .package-content {
+      padding: 1.5rem;
+    }
+    
+    .package-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .package-description {
+      color: var(--text-light);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    
+    .package-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .package-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+    
+    .package-duration {
+      color: var(--text-light);
+      font-size: 0.875rem;
+    }
+    
+    /* Status badges */
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-confirmed {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 0.75rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Larger modal for booking details */
+    #bookingDetailsModal .modal-content {
+      max-width: 600px;
+    }
+    
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+    
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+    }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 3000;
+    }
+    
+    .toast {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: var(--shadow-lg);
+      padding: 1rem 1.5rem;
+      margin-bottom: 0.5rem;
+      border-left: 4px solid var(--success);
+      min-width: 300px;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    .toast.error {
+      border-left-color: var(--error);
+    }
+    
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .toast-icon {
+      font-size: 1.25rem;
+      color: var(--success);
+    }
+    
+    .toast.error .toast-icon {
+      color: var(--error);
+    }
+    
+    .toast-message {
+      flex: 1;
+      font-weight: 500;
+    }
+    
+    /* Utility Classes */
+    .hidden {
+      display: none !important;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .page-title {
+        font-size: 1.5rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .packages-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="customer-badge">
+          <i class="fas fa-user-circle"></i>
+          CUSTOMER PORTAL
+        </div>
+        <a href="home.html" class="logo">
+          <i class="fas fa-mountain"></i> Island Trails
+        </a>
+        <div class="user-welcome">
+          <div class="name" id="userName">Welcome back!</div>
+          <div class="role">Customer Dashboard</div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="dashboard">
+          <i class="fas fa-home"></i>
+          Dashboard
+        </a>
+        <a href="#" class="nav-item" data-section="packages">
+          <i class="fas fa-box"></i>
+          Browse Packages
+        </a>
+        <a href="#" class="nav-item" data-section="bookings">
+          <i class="fas fa-calendar-check"></i>
+          My Bookings
+        </a>
+        <a href="#" class="nav-item" data-section="profile">
+          <i class="fas fa-user"></i>
+          Profile
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <div class="top-header">
+        <div class="top-header-content">
+          <div class="customer-title">
+            <i class="fas fa-user"></i>
+            <h1>Customer Dashboard</h1>
+          </div>
+          <div class="customer-status">
+            <div class="status-dot"></div>
+            <span id="customerUserName">Customer</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="main-content-body">
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="section active">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Welcome to your Island Trails customer portal</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon bookings">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+            </div>
+            <div class="stat-number" id="totalBookings">0</div>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-trend">
+              <i class="fas fa-arrow-up"></i>
+              <span>This month</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon packages">
+                <i class="fas fa-box"></i>
+              </div>
+            </div>
+            <div class="stat-number" id="totalPackages">0</div>
+            <div class="stat-label">Available Packages</div>
+            <div class="stat-trend">
+              <i class="fas fa-star"></i>
+              <span>Explore now</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon revenue">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+            </div>
+            <div class="stat-number" id="totalSpent">$0</div>
+            <div class="stat-label">Total Spent</div>
+            <div class="stat-trend">
+              <i class="fas fa-chart-line"></i>
+              <span>All time</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Recent Bookings</h3>
+            <a href="#" class="btn btn-primary btn-sm" onclick="switchSection('bookings')">
+              View All
+            </a>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Package</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBookingsTable">
+                  <tr>
+                    <td colspan="4" class="text-center">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Packages Section -->
+      <section id="packages-section" class="section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Browse Packages</h1>
+          <p class="page-subtitle">Discover amazing travel packages across Sri Lanka</p>
+        </div>
+        
+        <div class="packages-grid" id="packagesGrid">
+          <div class="text-center">Loading packages...</div>
+        </div>
+      </section>
+
+      <!-- Bookings Section -->
+      <section id="bookings-section" class="section hidden">
+        <div class="page-header">
+          <h1 class="page-title">My Bookings</h1>
+          <p class="page-subtitle">View and manage your travel bookings</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Bookings</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Package</th>
+                    <th>Date</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allBookingsTable">
+                  <tr>
+                    <td colspan="7" class="text-center">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Section -->
+      <section id="profile-section" class="section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Profile</h1>
+          <p class="page-subtitle">Manage your account information</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Personal Information</h3>
+          </div>
+          <div class="card-body">
+            <form id="profileForm">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" id="profileName" placeholder="Enter your full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="profileEmail" placeholder="Enter your email">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input type="tel" class="form-input" id="profilePhone" placeholder="Enter your phone number">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-input" id="profileAddress" placeholder="Enter your address">
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Profile
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+      </div> <!-- End main-content-body -->
+    </main>
+  </div>
+
+  <!-- Booking Modal -->
+  <div class="modal" id="bookingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Book Package</h3>
+        <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="bookingAlert"></div>
+        <form id="bookingForm">
+          <div class="form-group">
+            <label class="form-label">Package</label>
+            <input type="text" class="form-input" id="bookingPackageName" readonly>
+            <input type="hidden" id="bookingPackageId">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Booking Date</label>
+            <input type="date" class="form-input" id="bookingDate" required>
+            <small style="color: var(--text-light); font-size: 0.875rem;">Select your preferred travel date</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Package Price</label>
+            <input type="text" class="form-input" id="bookingPrice" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Additional Notes (Optional)</label>
+            <textarea class="form-input" id="bookingNotes" rows="3" placeholder="Any special requirements or requests..." disabled style="background: #f8fafc; color: var(--text-light);">
+Note: Guest count and special requests will be handled during confirmation process.</textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">Cancel</button>
+        <button type="submit" form="bookingForm" class="btn btn-primary">
+          <i class="fas fa-credit-card"></i> Book Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Details Modal -->
+  <div class="modal" id="bookingDetailsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Booking Details</h3>
+        <button class="modal-close" onclick="closeBookingDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="bookingDetailsAlert"></div>
+        <div id="bookingDetailsContent">
+          <div class="text-center" style="padding: 2rem; color: var(--text-light);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <div>Loading booking details...</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="bookingActionButtons" style="display: none; gap: 0.5rem;">
+          <button type="button" class="btn btn-primary" id="editBookingBtn" onclick="editCurrentBooking()" style="background: var(--primary); border: none;">
+            <i class="fas fa-edit"></i> Edit Date
+          </button>
+          <button type="button" class="btn btn-danger" id="deleteBookingBtn" onclick="deleteCurrentBooking()" style="background: #dc3545; border: none;">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="closeBookingDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // Global variables
+    let userBookings = [];
+    
+    // Toast Notification System
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="${icon} toast-icon"></i>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Show toast
+      setTimeout(() => toast.classList.add('show'), 100);
+      
+      // Hide and remove toast after 4 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => container.removeChild(toast), 300);
+      }, 4000);
+    }
+
+    // Authentication check
+    function checkAuth() {
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      return token;
+    }
+
+    // Fetch and display customer user data
+    async function loadCustomerData() {
+      const token = checkAuth();
+      if (!token) return;
+
+      try {
+        const response = await fetch('../backend/src/api/auth/userApi.php', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          // Update customer name in the header
+          const customerNameElement = document.querySelector('.customer-name');
+          if (customerNameElement) {
+            customerNameElement.textContent = data.data.name || 'Customer';
+          }
+          
+          // Update welcome message if userName element exists
+          const userNameElement = document.getElementById('userName');
+          if (userNameElement) {
+            userNameElement.textContent = `Welcome, ${data.data.name || 'Customer'}!`;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading customer data:', error);
+        // Fallback to localStorage if available
+        const userName = localStorage.getItem('user_name');
+        if (userName) {
+          const customerNameElement = document.querySelector('.customer-name');
+          if (customerNameElement) {
+            customerNameElement.textContent = userName;
+          }
+          const userNameElement = document.getElementById('userName');
+          if (userNameElement) {
+            userNameElement.textContent = `Welcome, ${userName}!`;
+          }
+        }
+      }
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('island_trails_token');
+      window.location.href = 'login.html';
+    }
+
+    // Navigation
+    function initNavigation() {
+      const navItems = document.querySelectorAll('.nav-item');
+      const sections = document.querySelectorAll('.section');
+
+      navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          // Remove active class from all nav items and sections
+          navItems.forEach(nav => nav.classList.remove('active'));
+          sections.forEach(section => section.classList.add('hidden'));
+          
+          // Add active class to clicked nav item
+          item.classList.add('active');
+          
+          // Show corresponding section
+          const sectionId = item.dataset.section + '-section';
+          const targetSection = document.getElementById(sectionId);
+          if (targetSection) {
+            targetSection.classList.remove('hidden');
+          }
+        });
+      });
+    }
+
+    // Switch section programmatically
+    function switchSection(sectionName) {
+      const navItems = document.querySelectorAll('.nav-item');
+      const sections = document.querySelectorAll('.section');
+      
+      // Remove active from all
+      navItems.forEach(nav => nav.classList.remove('active'));
+      sections.forEach(section => section.classList.add('hidden'));
+      
+      // Activate target
+      const targetNav = document.querySelector(`[data-section="${sectionName}"]`);
+      const targetSection = document.getElementById(sectionName + '-section');
+      
+      if (targetNav && targetSection) {
+        targetNav.classList.add('active');
+        targetSection.classList.remove('hidden');
+      }
+    }
+
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        // Load packages count
+        const packagesResponse = await fetch('http://localhost:8000/island-trails/packages/package/readAll');
+        const packagesData = await packagesResponse.json();
+        
+        if (packagesData.status === 'success' && Array.isArray(packagesData.data)) {
+          document.getElementById('totalPackages').textContent = packagesData.data.length;
+        }
+        
+        // Update booking statistics
+        const totalBookings = userBookings.length;
+        document.getElementById('totalBookings').textContent = totalBookings;
+        
+        // Calculate total spent
+        const totalSpent = userBookings.reduce((sum, booking) => {
+          return sum + parseFloat(booking.package_price || 0);
+        }, 0);
+        document.getElementById('totalSpent').textContent = `$${totalSpent.toLocaleString()}`;
+        
+        // Load recent bookings table
+        const recentTable = document.getElementById('recentBookingsTable');
+        if (userBookings.length > 0) {
+          // Show most recent 3 bookings
+          const recentBookings = userBookings.slice(-3).reverse();
+          recentTable.innerHTML = recentBookings.map(booking => {
+            const bookingDate = new Date(booking.booking_date).toLocaleDateString();
+            const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
+                               booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
+            
+            return `
+              <tr>
+                <td>${booking.package_title}</td>
+                <td>${bookingDate}</td>
+                <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
+                <td>$${parseFloat(booking.package_price).toLocaleString()}</td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          recentTable.innerHTML = `
+            <tr>
+              <td colspan="4" class="text-center" style="color: var(--text-light); font-style: italic;">
+                No bookings yet. Browse packages to make your first booking!
+              </td>
+            </tr>
+          `;
+        }
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Show error state
+        document.getElementById('totalPackages').textContent = '0';
+        document.getElementById('totalBookings').textContent = '0';
+        document.getElementById('totalSpent').textContent = '$0';
+      }
+    }
+
+    // Load packages
+    async function loadPackages() {
+      const grid = document.getElementById('packagesGrid');
+      grid.innerHTML = '<div class="text-center">Loading packages...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/packages/package/readAll');
+        const data = await response.json();
+        
+        if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+          grid.innerHTML = '';
+          data.data.forEach(pkg => {
+            const card = document.createElement('div');
+            card.className = 'package-card';
+            card.innerHTML = `
+              <img src="${pkg.image_url || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'}" 
+                   alt="${pkg.title}" class="package-image">
+              <div class="package-content">
+                <h3 class="package-title">${pkg.title || 'Untitled Package'}</h3>
+                <p class="package-description">${pkg.description || 'No description available.'}</p>
+                <div class="package-footer">
+                  <div>
+                    <div class="package-price">$${pkg.price || 'N/A'}</div>
+                    <div class="package-duration">${pkg.duration || 'Duration not specified'}</div>
+                  </div>
+                  <button class="btn btn-primary btn-sm" onclick="openBookingModal(${pkg.id}, '${pkg.title}', ${pkg.price})">
+                    <i class="fas fa-calendar-plus"></i> Book Now
+                  </button>
+                </div>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        } else {
+          grid.innerHTML = '<div class="text-center">No packages available at the moment.</div>';
+        }
+      } catch (error) {
+        console.error('Error loading packages:', error);
+        grid.innerHTML = '<div class="text-center">Failed to load packages.</div>';
+      }
+    }
+
+    // Load bookings
+    async function loadBookings() {
+      const table = document.getElementById('allBookingsTable');
+      
+      if (userBookings.length > 0) {
+        table.innerHTML = userBookings.map(booking => {
+          const bookingDate = new Date(booking.booking_date).toLocaleDateString();
+          const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
+                             booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
+          
+          return `
+            <tr>
+              <td>BK${String(booking.id).padStart(3, '0')}</td>
+              <td>${booking.package_title}</td>
+              <td>${bookingDate}</td>
+              <td>1</td>
+              <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
+              <td>$${parseFloat(booking.package_price).toLocaleString()}</td>
+              <td>
+                <button class="btn btn-secondary btn-sm" onclick="viewBooking(${booking.id})" title="View Details">
+                  <i class="fas fa-eye"></i> View
+                </button>
+                ${booking.status === 'pending' ? `
+                  <button class="btn btn-warning btn-sm" onclick="editBooking(${booking.id})" title="Edit Booking">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                ` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        table.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center" style="color: var(--text-light); font-style: italic; padding: 2rem;">
+              No bookings found. Browse packages to make your first booking!<br>
+              <small>Booking creation is connected to the backend API.</small>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Booking Modal Functions
+    function openBookingModal(packageId, packageName, packagePrice) {
+      const modal = document.getElementById('bookingModal');
+      const form = document.getElementById('bookingForm');
+      const alert = document.getElementById('bookingAlert');
+      
+      // Clear previous alerts
+      alert.innerHTML = '';
+      
+      // Populate form
+      document.getElementById('bookingPackageId').value = packageId;
+      document.getElementById('bookingPackageName').value = packageName;
+      document.getElementById('bookingPrice').value = `$${packagePrice}`;
+      
+      // Set minimum date to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('bookingDate').min = today;
+      
+      // Reset form
+      document.getElementById('bookingDate').value = '';
+      
+      modal.classList.add('active');
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+      document.getElementById('bookingForm').reset();
+    }
+
+    // Booking Details Modal Functions
+    function openBookingDetailsModal(bookingId) {
+      const modal = document.getElementById('bookingDetailsModal');
+      const content = document.getElementById('bookingDetailsContent');
+      const alert = document.getElementById('bookingDetailsAlert');
+      
+      // Clear previous alerts and show loading
+      alert.innerHTML = '';
+      content.innerHTML = `
+        <div class="text-center" style="padding: 2rem; color: var(--text-light);">
+          <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+          <div>Loading booking details...</div>
+        </div>
+      `;
+      
+      modal.classList.add('active');
+      
+      // Load booking details
+      loadBookingDetails(bookingId);
+    }
+
+    function closeBookingDetailsModal() {
+      document.getElementById('bookingDetailsModal').classList.remove('active');
+    }
+
+    // Load individual booking details
+    async function loadBookingDetails(bookingId) {
+      const token = localStorage.getItem('island_trails_token');
+      const content = document.getElementById('bookingDetailsContent');
+      const alert = document.getElementById('bookingDetailsAlert');
+      
+      if (!token) {
+        alert.innerHTML = `
+          <div style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1rem;">
+            Authentication required. Please login again.
+          </div>
+        `;
+        return;
+      }
+      
+      try {
+        console.log('Loading booking details for ID:', bookingId);
+        
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/read', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: parseInt(bookingId) })
+        });
+        
+        console.log('Booking details response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Booking details response:', data);
+        
+        if (data.status === 'success' && data.data) {
+          const booking = data.data;
+          
+          // Format the booking date
+          const bookingDate = new Date(booking.booking_date);
+          const formattedDate = bookingDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          // Format the created date
+          const createdDate = new Date(booking.created_at);
+          const formattedCreatedDate = createdDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          // Determine status color
+          const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
+                             booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
+          
+          content.innerHTML = `
+            <div style="display: grid; gap: 1.5rem;">
+              <!-- Booking Header -->
+              <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, var(--primary-light), var(--primary)); border-radius: 0.75rem; color: white;">
+                <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Booking #${booking.id}</h2>
+                <span class="status-badge ${statusClass}" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                  ${booking.status.toUpperCase()}
+                </span>
+              </div>
+              
+              <!-- Package Information -->
+              <div class="card" style="margin: 0; box-shadow: none; border: 1px solid var(--border);">
+                <div class="card-header" style="background: #f8fafc;">
+                  <h3 style="margin: 0; color: var(--text); font-size: 1.1rem;">
+                    <i class="fas fa-box" style="margin-right: 0.5rem; color: var(--accent-gold);"></i>
+                    Package Details
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <div style="display: grid; gap: 1rem;">
+                    <div>
+                      <strong style="color: var(--text);">${booking.package_title}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: between; align-items: center;">
+                      <span style="color: var(--text-light);">Price:</span>
+                      <span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-gold);">
+                        $${parseFloat(booking.package_price).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Booking Information -->
+              <div class="card" style="margin: 0; box-shadow: none; border: 1px solid var(--border);">
+                <div class="card-header" style="background: #f8fafc;">
+                  <h3 style="margin: 0; color: var(--text); font-size: 1.1rem;">
+                    <i class="fas fa-calendar" style="margin-right: 0.5rem; color: var(--primary);"></i>
+                    Booking Information
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                      <span style="color: var(--text-light);">Travel Date:</span>
+                      <span style="font-weight: 600; color: var(--text);">${formattedDate}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                      <span style="color: var(--text-light);">Booking Created:</span>
+                      <span style="color: var(--text);">${formattedCreatedDate}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                      <span style="color: var(--text-light);">Customer:</span>
+                      <span style="color: var(--text);">${booking.user_name}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                      <span style="color: var(--text-light);">Email:</span>
+                      <span style="color: var(--text);">${booking.user_email}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Status Information -->
+              <div style="padding: 1rem; background: #f8fafc; border-radius: 0.5rem; border-left: 4px solid var(--primary);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                  <strong style="color: var(--text);">Status Information</strong>
+                </div>
+                <p style="margin: 0; color: var(--text-light); line-height: 1.5;">
+                  ${booking.status === 'pending' ? 
+                    'Your booking is pending confirmation. You will receive an email once it\'s confirmed.' :
+                    booking.status === 'confirmed' ?
+                    'Your booking is confirmed! We look forward to hosting your trip.' :
+                    'This booking has been cancelled. Please contact support for more information.'
+                  }
+                </p>
+              </div>
+            </div>
+          `;
+          
+          // Show action buttons and store current booking ID
+          document.getElementById('bookingActionButtons').style.display = 'flex';
+          window.currentBookingId = booking.id;
+          
+        } else {
+          alert.innerHTML = `
+            <div style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1rem;">
+              ${data.message || 'Failed to load booking details.'}
+            </div>
+          `;
+          content.innerHTML = '';
+          document.getElementById('bookingActionButtons').style.display = 'none';
+        }
+        
+      } catch (error) {
+        console.error('Error loading booking details:', error);
+        alert.innerHTML = `
+          <div style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1rem;">
+            Network error: Unable to load booking details. Please try again.
+          </div>
+        `;
+        content.innerHTML = '';
+      }
+    }
+
+    // Functions for booking actions in details modal
+    function editCurrentBooking() {
+      if (window.currentBookingId) {
+        closeBookingDetailsModal();
+        openBookingEditModal(window.currentBookingId);
+      }
+    }
+
+    function deleteCurrentBooking() {
+      if (window.currentBookingId) {
+        deleteBooking(window.currentBookingId);
+      }
+    }
+
+    // Handle booking form submission
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        showToast('Authentication required. Please login again.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const alert = document.getElementById('bookingAlert');
+      const submitBtn = document.querySelector('#bookingForm').closest('.modal').querySelector('.btn-primary');
+      
+      // Clear previous alerts
+      alert.innerHTML = '';
+      
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Booking...';
+      
+      const bookingData = {
+        package_id: parseInt(document.getElementById('bookingPackageId').value),
+        booking_date: document.getElementById('bookingDate').value
+      };
+      
+      console.log('Creating booking with data:', bookingData);
+      console.log('Using token (first 30 chars):', token.substring(0, 30) + '...');
+      
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bookingData)
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Booking response:', data);
+        
+        if (data.status === 'success') {
+          // Store the new booking in our local array
+          userBookings.push(data.data);
+          
+          alert.innerHTML = `
+            <div style="padding: 1rem; background: #dcfce7; color: #166534; border-radius: 0.5rem; margin-bottom: 1rem;">
+              <strong>Booking created successfully!</strong><br>
+              Booking ID: ${data.data.id}<br>
+              Status: ${data.data.status}<br>
+              You will receive a confirmation email shortly.
+            </div>
+          `;
+          
+          setTimeout(() => {
+            closeBookingModal();
+            showToast('Booking created successfully!', 'success');
+            loadDashboardData(); // Refresh dashboard
+            loadBookings(); // Refresh bookings
+          }, 2000);
+          
+        } else {
+          alert.innerHTML = `
+            <div style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1rem;">
+              ${data.message || 'Failed to create booking. Please try again.'}
+            </div>
+          `;
+        }
+        
+      } catch (error) {
+        console.error('Booking creation error:', error);
+        alert.innerHTML = `
+          <div style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1rem;">
+            Network error: Unable to create booking. Please check your connection and try again.
+          </div>
+        `;
+      } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-credit-card"></i> Book Now';
+      }
+    });
+
+    // Booking action functions
+    function editBooking(bookingId) {
+      console.log('Editing booking ID:', bookingId);
+      openBookingEditModal(bookingId);
+    }
+
+    function viewBooking(bookingId) {
+      console.log('Viewing booking ID:', bookingId);
+      openBookingDetailsModal(bookingId);
+    }
+
+    // Booking Edit Modal Functions for Customer
+    function openBookingEditModal(bookingId) {
+      // For customers, we'll create a simple edit modal
+      const bookingData = userBookings.find(b => b.id === parseInt(bookingId));
+      
+      if (!bookingData) {
+        showToast('Booking not found. Please refresh the page.', 'error');
+        return;
+      }
+
+      // Check if booking can be edited (only pending bookings)
+      if (bookingData.status !== 'pending') {
+        showToast('Only pending bookings can be edited. Please contact support for confirmed or cancelled bookings.', 'warning');
+        return;
+      }
+
+      const newDate = prompt(
+        `Current booking date: ${new Date(bookingData.booking_date).toLocaleDateString()}\n\nEnter new booking date (YYYY-MM-DD format):`,
+        new Date(bookingData.booking_date).toISOString().split('T')[0]
+      );
+
+      if (newDate && newDate !== new Date(bookingData.booking_date).toISOString().split('T')[0]) {
+        // Validate date format
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(newDate)) {
+          showToast('Invalid date format. Please use YYYY-MM-DD format.', 'error');
+          return;
+        }
+
+        // Check if date is in the future
+        const selectedDate = new Date(newDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+          showToast('Booking date must be in the future.', 'error');
+          return;
+        }
+
+        updateCustomerBooking(bookingId, newDate);
+      }
+    }
+
+    // Update customer booking
+    async function updateCustomerBooking(bookingId, newDate) {
+      const token = localStorage.getItem('island_trails_token');
+      
+      console.log('Token from localStorage:', token ? 'Token exists' : 'No token found');
+      console.log('Token length:', token ? token.length : 0);
+      
+      if (!token) {
+        showToast('Authentication required. Please login again.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const bookingData = userBookings.find(b => b.id === parseInt(bookingId));
+      
+      if (!bookingData) {
+        console.error('Booking not found in userBookings array:', bookingId);
+        console.error('Available bookings:', userBookings);
+        showToast('Booking data not found. Please refresh the page and try again.', 'error');
+        return;
+      }
+
+      console.log('Found booking data:', bookingData);
+
+      const updateData = {
+        id: parseInt(bookingId),
+        package_id: bookingData.package_id,
+        booking_date: newDate + ' 09:00:00', // Default time
+        status: bookingData.status
+      };
+
+      console.log('Customer booking update data:', updateData);
+
+      try {
+        console.log('Sending request to:', 'http://localhost:8000/island-trails/bookings/booking/update');
+        console.log('Request headers:', {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        });
+        console.log('Request body:', JSON.stringify(updateData));
+        
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/update', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        });
+
+        console.log('Customer booking update response status:', response.status);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Customer booking update response:', data);
+
+        if (data.status === 'success') {
+          // Update local booking data
+          const bookingIndex = userBookings.findIndex(b => b.id === parseInt(bookingId));
+          if (bookingIndex !== -1) {
+            userBookings[bookingIndex] = data.data;
+          }
+
+          showToast('Booking date updated successfully!', 'success');
+          
+          // Refresh dashboard and bookings
+          loadDashboardData();
+          loadBookings();
+          
+          // Close the edit modal
+          document.getElementById('bookingEditModal')?.classList.remove('active');
+          
+        } else {
+          console.error('Update failed:', data);
+          showToast(`Failed to update booking: ${data.message}`, 'error');
+        }
+
+      } catch (error) {
+        console.error('Error updating customer booking:', error);
+        showToast(`Network error: ${error.message}`, 'error');
+      }
+    }
+
+    // Delete booking function
+    async function deleteBooking(bookingId) {
+      if (!confirm('Are you sure you want to delete this booking? This action cannot be undone.')) {
+        return;
+      }
+      
+      const token = localStorage.getItem('island_trails_token');
+      
+      if (!token) {
+        showToast('Authentication required. Please login again.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const deleteData = {
+        id: parseInt(bookingId)
+      };
+      
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/delete', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(deleteData)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          showToast('Booking deleted successfully', 'success');
+          
+          // Remove from local bookings array
+          userBookings = userBookings.filter(b => b.id !== parseInt(bookingId));
+          
+          // Refresh dashboard and bookings
+          loadDashboardData();
+          loadBookings();
+          
+          // Close any open modals
+          const modals = document.querySelectorAll('.modal');
+          modals.forEach(modal => modal.classList.remove('active'));
+          
+        } else {
+          showToast(result.message || 'Failed to delete booking', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting booking:', error);
+        showToast('Failed to delete booking. Please try again.', 'error');
+      }
+    }
+
+    // Test function to debug booking update
+    async function testBookingUpdate() {
+      const token = localStorage.getItem('island_trails_token');
+      console.log('=== BOOKING UPDATE TEST ===');
+      console.log('Token exists:', !!token);
+      
+      if (!token) {
+        console.log('No token found - need to login first');
+        showToast('Please login first', 'warning');
+        return;
+      }
+      
+      // Check if we have any bookings
+      if (!userBookings || userBookings.length === 0) {
+        console.log('No bookings found - loading user bookings...');
+        await loadBookings();
+        
+        if (!userBookings || userBookings.length === 0) {
+          console.log('Still no bookings found');
+          showToast('No bookings found to test', 'info');
+          return;
+        }
+      }
+      
+      const firstBooking = userBookings[0];
+      console.log('Testing with booking:', firstBooking);
+      
+      // Test update with a future date
+      const testDate = '2025-12-30';
+      console.log('Attempting to update booking to:', testDate);
+      
+      await updateCustomerBooking(firstBooking.id, testDate);
+    }
+
+    // Add test button (remove in production)
+    if (window.location.search.includes('debug=1')) {
+      document.addEventListener('DOMContentLoaded', function() {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = 'Test Booking Update';
+        testBtn.onclick = testBookingUpdate;
+        testBtn.style.position = 'fixed';
+        testBtn.style.top = '10px';
+        testBtn.style.right = '10px';
+        testBtn.style.zIndex = '9999';
+        testBtn.style.background = 'red';
+        testBtn.style.color = 'white';
+        testBtn.style.padding = '10px';
+        document.body.appendChild(testBtn);
+      });
+    }
+
+    // Profile form submission
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Simulate profile update
+      showToast('Profile updated successfully!', 'success');
+    });
+
+    // Modal click outside to close
+    window.addEventListener('click', (e) => {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check authentication
+      checkAuth();
+      
+      // Load customer data
+      loadCustomerData();
+      
+      // Initialize navigation
+      initNavigation();
+      
+      // Load initial data
+      loadDashboardData();
+      loadPackages();
+      loadBookings();
+    });
+  </script>
+</body>
+</html>

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Island Trails - Login</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
       min-height: 100vh;
@@ -88,6 +89,41 @@
     .login-container button:hover {
       background: linear-gradient(90deg, #2563eb 60%, #4299e1 100%);
     }
+    
+    .home-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+    }
+    
+    .home-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+    }
+    
+    .home-btn i:last-child {
+      margin-left: 2px;
+    }
+    
     .message {
       margin-top: 16px;
       text-align: center;
@@ -116,6 +152,14 @@
 </head>
 <body>
   <div class="bg-overlay"></div>
+  
+  <!-- Top-right home button -->
+  <a href="home.html" class="home-btn">
+    <i class="fas fa-home"></i>
+    Home
+    <i class="fas fa-arrow-right"></i>
+  </a>
+  
   <div class="login-container">
     <h2>Login to Island Trails</h2>
     <form id="loginForm" autocomplete="off">
@@ -127,6 +171,7 @@
 
       <button type="submit">Login</button>
     </form>
+    
     <div id="message" class="message" style="display:none;"></div>
   </div>
   <script>
@@ -161,10 +206,20 @@
           if (data.token) {
             localStorage.setItem('island_trails_token', data.token);
           }
-          // Check if user is admin and redirect
+          // Store user info if available
+          if (data.user) {
+            localStorage.setItem('user_name', data.user.name || data.user.username || 'User');
+            localStorage.setItem('user_role', data.user.role || 'customer');
+          }
+          // Check user role and redirect accordingly
           if (data.user && (data.user.role === 'admin' || data.user.role === 'Admin')) {
             setTimeout(function() {
               window.location.href = 'admin.html';
+            }, 800);
+          } else {
+            // Redirect customer to customer dashboard
+            setTimeout(function() {
+              window.location.href = 'customer.html';
             }, 800);
           }
         } else {

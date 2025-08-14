@@ -47,7 +47,8 @@ class JwtHandler{
      * @return array Token data or error information
      */
     public static function getTokenFromHeader() {
-        $headers = getallheaders();
+        // Handle both CLI and web environments
+        $headers = function_exists('getallheaders') ? getallheaders() : self::getAllHeadersManual();
         $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
         
         if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
@@ -59,5 +60,19 @@ class JwtHandler{
             'valid' => false,
             'data' => 'No token found in Authorization header'
         ];
+    }
+    
+    /**
+     * Manual implementation of getallheaders for environments where it's not available
+     */
+    private static function getAllHeadersManual() {
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if (strpos($key, 'HTTP_') === 0) {
+                $header = str_replace('_', '-', substr($key, 5));
+                $headers[$header] = $value;
+            }
+        }
+        return $headers;
     }
 }

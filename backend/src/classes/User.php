@@ -47,7 +47,24 @@ class User extends Model{
     public function update(){}
     public function delete(){}
 
-    public function read(){}
+    public function read(){
+        $conn = DatabaseConnection::getConnection();
+        $sql = "SELECT id, name, email, role, created_at FROM users WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function readAll(){
+        $conn = DatabaseConnection::getConnection();
+        $sql = "SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $results;
+    }
 }
 
 

@@ -9,6 +9,8 @@ class UserApi extends ApiResourceBase{
     $this -> setRoles([
         "create" => ["admin", "user"],
         "login" => ["customer", "admin", null],
+        "readAll" => ["admin"],
+        "read" => ["admin"],
     ]);
    }
 
@@ -74,6 +76,50 @@ class UserApi extends ApiResourceBase{
         ];
     }
 
+   }
+
+   public function readAll($data = null){
+        $user = new User();
+        $users = $user->readAll();
+        
+        if ($users !== false) {
+            return [
+                'status' => 'success', 
+                'message' => 'Users retrieved successfully',
+                'data' => $users
+            ];
+        } else {
+            return [
+                'status' => 'error', 
+                'message' => 'Failed to retrieve users'
+            ];
+        }
+   }
+
+   public function read($data){
+        if (!isset($data['id'])) {
+            return [
+                'status' => 'error', 
+                'message' => 'User ID is required'
+            ];
+        }
+
+        $user = new User();
+        $user->id = $data['id'];
+        $userData = $user->read();
+        
+        if ($userData) {
+            return [
+                'status' => 'success', 
+                'message' => 'User retrieved successfully',
+                'data' => $userData
+            ];
+        } else {
+            return [
+                'status' => 'error', 
+                'message' => 'User not found'
+            ];
+        }
    }
 
     

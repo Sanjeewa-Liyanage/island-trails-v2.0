@@ -207,7 +207,7 @@ class BookingApi extends ApiResourceBase {
         }
         
         // Check if user can modify this booking
-        if ($userRole !== 'admin' && !$booking->canUserModify($userId)) {
+        if ($userRole !== 'admin' && $existingBooking['user_id'] != $userId) {
             return ["status" => "error", "message" => "Access denied"];
         }
         
