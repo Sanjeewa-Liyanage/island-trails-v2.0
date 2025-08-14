@@ -2,159 +2,1264 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Island Trails - Admin Panel</title>
+  <title>Island Trails Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    body {
-      min-height: 100vh;
+    :root {
+      --primary: #2563eb;
+      --primary-light: #60a5fa;
+      --primary-dark: #1e40af;
+      --bg: #f8fafc;
+      --sidebar: #ffffff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    
+    * {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      background: url('https://cdn.pixabay.com/photo/2018/08/21/17/56/ella-3621804_1280.jpg') no-repeat center center fixed;
-      background-size: cover;
-      position: relative;
+      box-sizing: border-box;
     }
-    .bg-overlay {
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 1000;
+    }
+    
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 1.5rem 0;
+    }
+    
+    .nav-item {
+      display: block;
+      padding: 0.875rem 1.5rem;
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    
+    .nav-item:hover,
+    .nav-item.active {
+      background: #f1f5f9;
+      color: var(--primary);
+      border-left-color: var(--primary);
+    }
+    
+    .nav-item i {
+      margin-right: 0.75rem;
+      width: 20px;
+    }
+    
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .logout-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--error);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+    
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    
+    .page-header {
+      margin-bottom: 2rem;
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #059669;
+    }
+    
+    .btn-danger {
+      background: var(--error);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+    }
+    
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.375rem 0.75rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-size: 0.75rem;
+      margin-right: 0.5rem;
+      background: var(--primary-light);
+      color: white;
+    }
+    
+    .action-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    .action-btn.delete {
+      background: var(--error);
+    }
+    
+    .action-btn.delete:hover {
+      background: #dc2626;
+    }
+    
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .table th,
+    .table td {
+      padding: 0.875rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .table tbody tr:hover {
+      background: #f8fafc;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.35);
-      z-index: 0;
-      pointer-events: none;
-    }
-    .admin-panel {
-      background: rgba(255, 255, 255, 0.18);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(10px) saturate(180%);
-      -webkit-backdrop-filter: blur(10px) saturate(180%);
-      border-radius: 18px;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      padding: 36px 30px 28px 30px;
-      width: 420px;
-      margin: 40px auto 0 auto;
-      position: relative;
-      z-index: 1;
-      color: #fff;
-    }
-    .admin-panel h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #fff;
-      letter-spacing: 1px;
-      font-weight: 700;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    table {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 18px;
-      background: rgba(255,255,255,0.10);
-      border-radius: 8px;
-      overflow: hidden;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
     }
-    th, td {
-      padding: 10px 8px;
-      text-align: left;
-      color: #fff;
+    
+    .modal.active {
+      display: flex;
     }
-    th {
-      background: rgba(49,130,206,0.7);
+    
+    .modal-content {
+      background: white;
+      border-radius: 0.75rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.25rem;
       font-weight: 600;
     }
-    tr:nth-child(even) {
-      background: rgba(255,255,255,0.08);
-    }
-    tr:nth-child(odd) {
-      background: rgba(0,0,0,0.08);
-    }
-    .logout-btn {
-      margin-top: 18px;
-      width: 100%;
-      padding: 10px 0;
-      background: linear-gradient(90deg, #3182ce 60%, #63b3ed 100%);
-      color: #fff;
+    
+    .modal-close {
+      background: none;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 1.5rem;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(49,130,206,0.08);
-      transition: background 0.2s;
+      color: var(--text-light);
     }
-    .logout-btn:hover {
-      background: linear-gradient(90deg, #2563eb 60%, #4299e1 100%);
+    
+    .modal-body {
+      padding: 1.5rem;
     }
-    @media (max-width: 600px) {
-      .admin-panel {
-        width: 98vw;
-        padding: 18px 2vw 18px 2vw;
+    
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+    
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+    }
+    
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    /* Alerts */
+    .alert {
+      padding: 0.875rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    
+    /* Utility Classes */
+    .hidden {
+      display: none !important;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .justify-between {
+      justify-content: space-between;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    .gap-2 {
+      gap: 0.5rem;
+    }
+    
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 3000;
+    }
+    
+    .toast {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: var(--shadow-lg);
+      padding: 1rem 1.5rem;
+      margin-bottom: 0.5rem;
+      border-left: 4px solid var(--success);
+      min-width: 300px;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    .toast.error {
+      border-left-color: var(--error);
+    }
+    
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .toast-icon {
+      font-size: 1.25rem;
+      color: var(--success);
+    }
+    
+    .toast.error .toast-icon {
+      color: var(--error);
+    }
+    
+    .toast-message {
+      flex: 1;
+      font-weight: 500;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .page-title {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
-<body>
-  <div class="bg-overlay"></div>
-  <div class="admin-panel">
-    <h2>Admin Panel - Island Trails</h2>
-    <h3>All Bookings</h3>
-    <table id="bookingsTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>User</th>
-          <th>Email</th>
-          <th>Package</th>
-          <th>Price</th>
-          <th>Date</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="bookingsBody">
-        <tr><td colspan="7" style="text-align:center;color:#fff;">Loading...</td></tr>
-      </tbody>
-    </table>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+<<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="logo">
+          <i class="fas fa-mountain"></i> Island Trails
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="bookings">
+          <i class="fas fa-calendar-check"></i>
+          Bookings
+        </a>
+        <a href="#" class="nav-item" data-section="users">
+          <i class="fas fa-users"></i>
+          Users
+        </a>
+        <a href="#" class="nav-item" data-section="packages">
+          <i class="fas fa-box"></i>
+          Packages
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Bookings Section -->
+      <section id="bookings-section" class="section active">
+        <div class="page-header">
+          <h1 class="page-title">Bookings Management</h1>
+          <p class="page-subtitle">Manage all customer bookings</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Bookings</h3>
+            <button class="btn btn-primary" onclick="openBookingModal()">
+              <i class="fas fa-plus"></i> Add Booking
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Package</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingsTableBody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-light);">
+                      Loading bookings...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users Section -->
+      <section id="users-section" class="section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Users Management</h1>
+          <p class="page-subtitle">Manage system users and administrators</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Users</h3>
+            <button class="btn btn-primary" onclick="openUserModal()">
+              <i class="fas fa-plus"></i> Add User
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-light);">
+                      Loading users...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Packages Section -->
+      <section id="packages-section" class="section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Packages Management</h1>
+          <p class="page-subtitle">Manage tour packages and destinations</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Packages</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-secondary" onclick="loadPackages()" title="Refresh packages">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+              <button class="btn btn-secondary" onclick="testToken()" title="Test Authentication">
+                <i class="fas fa-key"></i> Test Token
+              </button>
+              <button class="btn btn-secondary" onclick="testServerConnection()" title="Test Server">
+                <i class="fas fa-server"></i> Test Server
+              </button>
+              <button class="btn btn-primary" onclick="openPackageModal()">
+                <i class="fas fa-plus"></i> Add Package
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="packagesTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-light);">
+                      Loading packages...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
+
+  <!-- Package Modal -->
+  <div class="modal" id="packageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="packageModalTitle">Add New Package</h3>
+        <button class="modal-close" onclick="closePackageModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="packageAlert"></div>
+        <form id="packageForm">
+          <div class="form-group">
+            <label class="form-label" for="packageTitle">Package Title</label>
+            <input type="text" id="packageTitle" name="title" class="form-input" required 
+                   placeholder="e.g., Galle Fort & Southern Coast Explorer">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="packageDescription">Description</label>
+            <textarea id="packageDescription" name="description" class="form-input form-textarea" required 
+                      placeholder="Detailed description of the package..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="packagePrice">Price (LKR)</label>
+            <input type="number" id="packagePrice" name="price" class="form-input" required 
+                   min="0" step="0.01" placeholder="15500.00">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="packageDuration">Duration</label>
+            <input type="text" id="packageDuration" name="duration" class="form-input" required 
+                   placeholder="e.g., 3 days, 2 nights">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="packageImage">Image URL</label>
+            <input type="url" id="packageImage" name="image_url" class="form-input" required 
+                   placeholder="https://example.com/images/package.jpg">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closePackageModal()">Cancel</button>
+        <button type="submit" form="packageForm" class="btn btn-primary" id="packageSubmitBtn">
+          <i class="fas fa-save"></i> Create Package
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Modal (Placeholder) -->
+  <div class="modal" id="bookingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Booking</h3>
+        <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+          Booking form will be implemented when API endpoints are provided.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Modal (Placeholder) -->
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New User</h3>
+        <button class="modal-close" onclick="closeUserModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+          User form will be implemented when API endpoints are provided.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script>
+    // Toast Notification System
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="${icon} toast-icon"></i>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Show toast
+      setTimeout(() => toast.classList.add('show'), 100);
+      
+      // Hide and remove toast after 4 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => container.removeChild(toast), 300);
+      }, 4000);
+    }
+
+    // Authentication check
+    function checkAuth() {
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      return token;
+    }
+
+    // Logout function
     function logout() {
       localStorage.removeItem('island_trails_token');
       window.location.href = 'login.html';
     }
-    // Optionally, check if token exists, else redirect to login
-    if (!localStorage.getItem('island_trails_token')) {
-      window.location.href = 'login.html';
+
+    // Navigation
+    function initNavigation() {
+      const navItems = document.querySelectorAll('.nav-item');
+      const sections = document.querySelectorAll('.section');
+
+      navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          // Remove active class from all nav items and sections
+          navItems.forEach(nav => nav.classList.remove('active'));
+          sections.forEach(section => section.classList.add('hidden'));
+          
+          // Add active class to clicked nav item
+          item.classList.add('active');
+          
+          // Show corresponding section
+          const sectionId = item.dataset.section + '-section';
+          const targetSection = document.getElementById(sectionId);
+          if (targetSection) {
+            targetSection.classList.remove('hidden');
+          }
+        });
+      });
     }
-    // Load bookings from backend
-    async function loadBookings() {
-      const tbody = document.getElementById('bookingsBody');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fff;">Loading...</td></tr>';
+
+    // Package Modal Functions
+    function openPackageModal(packageData = null) {
+      const modal = document.getElementById('packageModal');
+      const form = document.getElementById('packageForm');
+      const title = document.getElementById('packageModalTitle');
+      const submitBtn = document.getElementById('packageSubmitBtn');
+      const alert = document.getElementById('packageAlert');
+      
+      // Clear previous alerts
+      alert.innerHTML = '';
+      
+      if (packageData) {
+        // Edit mode
+        title.textContent = 'Edit Package';
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Package';
+        submitBtn.setAttribute('data-mode', 'edit');
+        submitBtn.setAttribute('data-id', packageData.id);
+        
+        // Populate form fields
+        form.title.value = packageData.title || '';
+        form.description.value = packageData.description || '';
+        form.price.value = packageData.price || '';
+        form.duration.value = packageData.duration || '';
+        form.image_url.value = packageData.image_url || '';
+      } else {
+        // Create mode
+        title.textContent = 'Add New Package';
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Package';
+        submitBtn.setAttribute('data-mode', 'create');
+        submitBtn.removeAttribute('data-id');
+        form.reset();
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function closePackageModal() {
+      document.getElementById('packageModal').classList.remove('active');
+    }
+
+    function openBookingModal() {
+      document.getElementById('bookingModal').classList.add('active');
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+    }
+
+    function openUserModal() {
+      document.getElementById('userModal').classList.add('active');
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.remove('active');
+    }
+
+    // Package Form Submission
+    async function handlePackageSubmit(e) {
+      e.preventDefault();
+      
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        const alert = document.getElementById('packageAlert');
+        alert.innerHTML = `
+          <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> Not authenticated. Please login again.
+          </div>
+        `;
+        return;
+      }
+      
+      const form = e.target;
+      const alert = document.getElementById('packageAlert');
+      const submitBtn = document.getElementById('packageSubmitBtn');
+      
+      // Clear previous alerts
+      alert.innerHTML = '';
+      
+      // Get mode and ID from button attributes
+      const mode = submitBtn.getAttribute('data-mode') || 'create';
+      const packageId = submitBtn.getAttribute('data-id');
+      
+      // Disable submit button
+      submitBtn.disabled = true;
+      if (mode === 'edit') {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      } else {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+      }
+      
+      const formData = {
+        title: form.title.value.trim(),
+        description: form.description.value.trim(),
+        price: parseFloat(form.price.value),
+        duration: form.duration.value.trim(),
+        image_url: form.image_url.value.trim()
+      };
+      
+      // Add ID for update operations
+      if (mode === 'edit' && packageId) {
+        formData.id = parseInt(packageId);
+      }
+      
       try {
-        const res = await fetch('http://localhost:8000/island-trails/bookings/booking/readAll');
-        const data = await res.json();
-        if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
-          tbody.innerHTML = '';
-          data.data.forEach(b => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${b.id}</td>
-              <td>${b.user_name || ''}</td>
-              <td>${b.user_email || ''}</td>
-              <td>${b.package_title || ''}</td>
-              <td>${b.package_price ? 'Rs. ' + b.package_price : ''}</td>
-              <td>${b.booking_date ? b.booking_date.split(' ')[0] : ''}</td>
-              <td>${b.status}</td>
-            `;
-            tbody.appendChild(tr);
-          });
+        let endpoint, method;
+        
+        if (mode === 'edit') {
+          endpoint = 'http://localhost:8000/island-trails/packages/package/update';
+          method = 'POST';
         } else {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fff;">No bookings found.</td></tr>';
+          endpoint = 'http://localhost:8000/island-trails/packages/package/create';
+          method = 'POST';
         }
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fff;">Failed to load bookings.</td></tr>';
+        
+        console.log(`Making ${method} request to:`, endpoint);
+        console.log('Payload:', formData);
+        
+        const response = await fetch(endpoint, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        console.log('Response:', data);
+        
+        if (data.status === 'success') {
+          alert.innerHTML = `
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i> ${data.message || (mode === 'edit' ? 'Package updated successfully!' : 'Package created successfully!')}
+            </div>
+          `;
+          
+          // Reset form
+          form.reset();
+          
+          // Reload packages table
+          loadPackages();
+          
+          // Close modal after 2 seconds
+          setTimeout(() => {
+            closePackageModal();
+          }, 2000);
+        } else {
+          throw new Error(data.message || `Failed to ${mode} package`);
+        }
+        
+      } catch (error) {
+        console.error(`Error ${mode === 'edit' ? 'updating' : 'creating'} package:`, error);
+        alert.innerHTML = `
+          <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> ${error.message || `An error occurred while ${mode === 'edit' ? 'updating' : 'creating'} the package`}
+          </div>
+        `;
+      } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        if (mode === 'edit') {
+          submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Package';
+        } else {
+          submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Package';
+        }
       }
     }
-    window.addEventListener('DOMContentLoaded', loadBookings);
+
+    // Load Data Functions
+    async function loadBookings() {
+      const tbody = document.getElementById('bookingsTableBody');
+      // Placeholder - will be implemented when API endpoints are provided
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-light); padding: 2rem;">
+            No bookings data available. API endpoint to be provided.
+          </td>
+        </tr>
+      `;
+    }
+
+    async function loadUsers() {
+      const tbody = document.getElementById('usersTableBody');
+      // Placeholder - will be implemented when API endpoints are provided
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-light); padding: 2rem;">
+            No users data available. API endpoint to be provided.
+          </td>
+        </tr>
+      `;
+    }
+
+    async function loadPackages() {
+      const tbody = document.getElementById('packagesTableBody');
+      
+      // Get token directly from localStorage
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Show loading state
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-light); padding: 2rem;">
+            <i class="fas fa-spinner fa-spin"></i> Loading packages...
+          </td>
+        </tr>
+      `;
+      
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/packages/package/readAll', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const data = await response.json();
+        console.log('Packages API response:', data);
+        
+        if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+          tbody.innerHTML = '';
+          
+          data.data.forEach(pkg => {
+            const row = document.createElement('tr');
+            
+            // Store package data as attributes for editing
+            row.setAttribute('data-package-id', pkg.id);
+            row.setAttribute('data-title', pkg.title || '');
+            row.setAttribute('data-description', pkg.description || '');
+            row.setAttribute('data-price', pkg.price || '');
+            row.setAttribute('data-duration', pkg.duration || '');
+            row.setAttribute('data-image-url', pkg.image_url || '');
+            
+            row.innerHTML = `
+              <td>${pkg.id}</td>
+              <td style="max-width: 200px;">${pkg.title}</td>
+              <td style="color: var(--success); font-weight: 600;">LKR ${parseFloat(pkg.price).toLocaleString()}</td>
+              <td>${pkg.duration}</td>
+              <td>
+                <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                  Active
+                </span>
+              </td>
+              <td class="actions">
+                <button class="action-btn btn-sm" onclick="editPackage(${pkg.id})" title="Edit Package">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="action-btn btn-sm delete" onclick="deletePackage(${pkg.id})" title="Delete Package">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        } else {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-light); padding: 2rem;">
+                <i class="fas fa-box-open"></i> No packages found.
+              </td>
+            </tr>
+          `;
+        }
+        
+      } catch (error) {
+        console.error('Error loading packages:', error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--error); padding: 2rem;">
+              <i class="fas fa-exclamation-triangle"></i> Failed to load packages. Please try again.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Test function to verify token is working
+    function testToken() {
+      const token = localStorage.getItem('island_trails_token');
+      if (!token) {
+        showToast('No token found in localStorage!', 'error');
+        return;
+      }
+      
+      console.log('Token found:', token.substring(0, 50) + '...');
+      showToast('Token found and ready for API calls!', 'success');
+    }
+
+    // Test function to check server connectivity
+    async function testServerConnection() {
+      try {
+        console.log('Testing server connection...');
+        const response = await fetch('http://localhost:8000/island-trails/packages/package/readAll');
+        console.log('Server response status:', response.status);
+        
+        if (response.ok) {
+          showToast('Server is responding!', 'success');
+        } else {
+          showToast(`Server error: ${response.status}`, 'error');
+        }
+      } catch (error) {
+        console.error('Server connection error:', error);
+        showToast('Cannot connect to server!', 'error');
+      }
+    }
+
+    // Action Functions
+    function editPackage(id) {
+      // Find the package data from the current table
+      const packageRow = document.querySelector(`tr[data-package-id="${id}"]`);
+      if (!packageRow) {
+        console.error('Package row not found for ID:', id);
+        showToast('Package data not found', 'error');
+        return;
+      }
+      
+      // Extract package data from the row
+      const packageData = {
+        id: id,
+        title: packageRow.getAttribute('data-title'),
+        description: packageRow.getAttribute('data-description'),
+        price: packageRow.getAttribute('data-price'),
+        duration: packageRow.getAttribute('data-duration'),
+        image_url: packageRow.getAttribute('data-image-url')
+      };
+      
+      console.log('Editing package:', packageData);
+      openPackageModal(packageData);
+    }
+
+    function deletePackage(id) {
+      if (confirm('Are you sure you want to delete this package? This action cannot be undone.')) {
+        handleDeletePackage(id);
+      }
+    }
+
+    async function handleDeletePackage(id) {
+      // Get token directly from localStorage
+      const token = localStorage.getItem('island_trails_token');
+      
+      if (!token) {
+        showToast('Authentication required. Please login again.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      console.log('Attempting to delete package with ID:', id);
+      console.log('Using token (first 30 chars):', token.substring(0, 30) + '...');
+      console.log('Full API URL:', 'http://localhost:8000/island-trails/packages/package/delete');
+      
+      const requestData = { id: parseInt(id) };
+      console.log('Request payload:', requestData);
+      
+      try {
+        console.log('Making DELETE request...');
+        
+        const response = await fetch('http://localhost:8000/island-trails/packages/package/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        });
+        
+        console.log('Response received. Status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data.status === 'success') {
+          showToast(data.message || 'Package deleted successfully!', 'success');
+          loadPackages();
+        } else {
+          throw new Error(data.message || 'Failed to delete package');
+        }
+        
+      } catch (error) {
+        console.error('Detailed error:', error);
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          showToast('Network error: Unable to connect to server. Please check if the backend is running.', 'error');
+        } else {
+          showToast(`Error deleting package: ${error.message}`, 'error');
+        }
+      }
+    }
+
+    function editBooking(id) {
+      console.log('Edit booking:', id);
+      // Will be implemented when edit API is provided
+    }
+
+    function deleteBooking(id) {
+      if (confirm('Are you sure you want to delete this booking?')) {
+        console.log('Delete booking:', id);
+        // Will be implemented when delete API is provided
+      }
+    }
+
+    function editUser(id) {
+      console.log('Edit user:', id);
+      // Will be implemented when edit API is provided
+    }
+
+    function deleteUser(id) {
+      if (confirm('Are you sure you want to delete this user?')) {
+        console.log('Delete user:', id);
+        // Will be implemented when delete API is provided
+      }
+    }
+
+    // Modal click outside to close
+    window.addEventListener('click', (e) => {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check authentication
+      checkAuth();
+      
+      // Initialize navigation
+      initNavigation();
+      
+      // Attach form submission handler
+      document.getElementById('packageForm').addEventListener('submit', handlePackageSubmit);
+      
+      // Load initial data
+      loadBookings();
+      loadUsers();
+      loadPackages();
+    });
   </script>
 </body>
 </html>
