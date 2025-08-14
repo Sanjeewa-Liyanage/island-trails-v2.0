@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Island Trails - Admin Panel</title>
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://cdn.pixabay.com/photo/2018/08/21/17/56/ella-3621804_1280.jpg') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+    }
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.35);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .admin-panel {
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(10px) saturate(180%);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      border-radius: 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      padding: 36px 30px 28px 30px;
+      width: 420px;
+      margin: 40px auto 0 auto;
+      position: relative;
+      z-index: 1;
+      color: #fff;
+    }
+    .admin-panel h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fff;
+      letter-spacing: 1px;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      background: rgba(255,255,255,0.10);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 8px;
+      text-align: left;
+      color: #fff;
+    }
+    th {
+      background: rgba(49,130,206,0.7);
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: rgba(255,255,255,0.08);
+    }
+    tr:nth-child(odd) {
+      background: rgba(0,0,0,0.08);
+    }
+    .logout-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 10px 0;
+      background: linear-gradient(90deg, #3182ce 60%, #63b3ed 100%);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(49,130,206,0.08);
+      transition: background 0.2s;
+    }
+    .logout-btn:hover {
+      background: linear-gradient(90deg, #2563eb 60%, #4299e1 100%);
+    }
+    @media (max-width: 600px) {
+      .admin-panel {
+        width: 98vw;
+        padding: 18px 2vw 18px 2vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-overlay"></div>
+  <div class="admin-panel">
+    <h2>Admin Panel - Island Trails</h2>
+    <h3>All Bookings</h3>
+    <table id="bookingsTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Email</th>
+          <th>Package</th>
+          <th>Price</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="bookingsBody">
+        <tr><td colspan="7" style="text-align:center;color:#fff;">Loading...</td></tr>
+      </tbody>
+    </table>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+  <script>
+    function logout() {
+      localStorage.removeItem('island_trails_token');
+      window.location.href = 'login.html';
+    }
+    // Optionally, check if token exists, else redirect to login
+    if (!localStorage.getItem('island_trails_token')) {
+      window.location.href = 'login.html';
+    }
+    // Load bookings from backend
+    async function loadBookings() {
+      const tbody = document.getElementById('bookingsBody');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fff;">Loading...</td></tr>';
+      try {
+        const res = await fetch('http://localhost:8000/island-trails/bookings/booking/readAll');
+        const data = await res.json();
+        if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+          tbody.innerHTML = '';
+          data.data.forEach(b => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${b.id}</td>
+              <td>${b.user_name || ''}</td>
+              <td>${b.user_email || ''}</td>
+              <td>${b.package_title || ''}</td>
+              <td>${b.package_price ? 'Rs. ' + b.package_price : ''}</td>
+              <td>${b.booking_date ? b.booking_date.split(' ')[0] : ''}</td>
+              <td>${b.status}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fff;">No bookings found.</td></tr>';
+        }
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fff;">Failed to load bookings.</td></tr>';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', loadBookings);
+  </script>
+</body>
+</html>
