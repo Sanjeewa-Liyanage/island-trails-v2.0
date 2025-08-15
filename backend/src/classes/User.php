@@ -66,7 +66,7 @@ class User extends Model{
 
     public function readAll(){
         $conn = DatabaseConnection::getConnection();
-        $sql = "SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC";
+        $sql = "SELECT id, name, email, role, created_at FROM users WHERE role != 'admin' ORDER BY created_at DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
