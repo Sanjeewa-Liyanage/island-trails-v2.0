@@ -648,6 +648,10 @@
       </div>
       
       <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item">
+          <i class="fas fa-home"></i>
+          Home
+        </a>
         <a href="#" class="nav-item active" data-section="bookings">
           <i class="fas fa-calendar-check"></i>
           Bookings
@@ -1002,6 +1006,34 @@
     </div>
   </div>
 
+  <!-- Booking Details Modal -->
+  <div class="modal" id="bookingDetailsModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Booking Details</h3>
+        <button class="modal-close" onclick="closeBookingDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="bookingDetailsAlert"></div>
+        <div id="bookingDetailsContent">
+          <div class="text-center" style="padding: 2rem; color: var(--text-light);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <div>Loading booking details...</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeBookingDetailsModal()">Close</button>
+        <button type="button" class="btn btn-warning" id="editBookingFromDetails" style="display:none;">
+          <i class="fas fa-edit"></i> Edit Status
+        </button>
+        <button type="button" class="btn btn-danger" id="deleteBookingFromDetails" style="display:none;">
+          <i class="fas fa-trash"></i> Delete Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
@@ -1081,21 +1113,25 @@
 
       navItems.forEach(item => {
         item.addEventListener('click', (e) => {
-          e.preventDefault();
-          
-          // Remove active class from all nav items and sections
-          navItems.forEach(nav => nav.classList.remove('active'));
-          sections.forEach(section => section.classList.add('hidden'));
-          
-          // Add active class to clicked nav item
-          item.classList.add('active');
-          
-          // Show corresponding section
-          const sectionId = item.dataset.section + '-section';
-          const targetSection = document.getElementById(sectionId);
-          if (targetSection) {
-            targetSection.classList.remove('hidden');
+          // Only prevent default for internal navigation items (those with data-section)
+          if (item.dataset.section) {
+            e.preventDefault();
+            
+            // Remove active class from all nav items and sections
+            navItems.forEach(nav => nav.classList.remove('active'));
+            sections.forEach(section => section.classList.add('hidden'));
+            
+            // Add active class to clicked nav item
+            item.classList.add('active');
+            
+            // Show corresponding section
+            const sectionId = item.dataset.section + '-section';
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+              targetSection.classList.remove('hidden');
+            }
           }
+          // For items without data-section (like home button), allow default behavior
         });
       });
     }
@@ -1736,9 +1772,184 @@
 
     // Booking Action Functions
     function viewBookingDetails(bookingId) {
-      // For now, show booking details in a toast - can be enhanced with modal later
-      showToast(`Viewing details for Booking #${bookingId}. Detailed view modal can be implemented.`, 'info');
-      console.log('View booking details:', bookingId);
+      openBookingDetailsModal(bookingId);
+    }
+
+    function openBookingDetailsModal(bookingId) {
+      const modal = document.getElementById('bookingDetailsModal');
+      const content = document.getElementById('bookingDetailsContent');
+      const alert = document.getElementById('bookingDetailsAlert');
+      
+      // Clear previous content
+      alert.innerHTML = '';
+      content.innerHTML = `
+        <div class="text-center" style="padding: 2rem; color: var(--text-light);">
+          <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+          <div>Loading booking details...</div>
+        </div>
+      `;
+      
+      // Show modal
+      modal.classList.add('active');
+      
+      // Fetch booking details
+      loadBookingDetails(bookingId);
+    }
+
+    function closeBookingDetailsModal() {
+      document.getElementById('bookingDetailsModal').classList.remove('active');
+    }
+
+    async function loadBookingDetails(bookingId) {
+      const token = localStorage.getItem('island_trails_token');
+      const content = document.getElementById('bookingDetailsContent');
+      const alert = document.getElementById('bookingDetailsAlert');
+      const editBtn = document.getElementById('editBookingFromDetails');
+      const deleteBtn = document.getElementById('deleteBookingFromDetails');
+      
+      if (!token) {
+        content.innerHTML = `
+          <div class="text-center" style="padding: 2rem; color: var(--error);">
+            <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <div>Authentication required. Please login again.</div>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8000/island-trails/bookings/booking/read', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ id: parseInt(bookingId) })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Booking details response:', data);
+
+        if (data.status === 'success' && data.data) {
+          const booking = data.data;
+          const bookingDate = new Date(booking.booking_date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+          });
+          const bookingTime = new Date(booking.booking_date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          const createdDate = new Date(booking.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          const createdTime = new Date(booking.created_at).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
+                             booking.status === 'pending' ? 'status-pending' : 'status-cancelled';
+
+          content.innerHTML = `
+            <div style="display: grid; gap: 1.5rem;">
+              <!-- Booking Info Card -->
+              <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem;">
+                <h4 style="margin: 0 0 1rem 0; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fas fa-calendar-check"></i>
+                  Booking Information
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div>
+                    <strong>Booking ID:</strong><br>
+                    <span style="color: var(--primary);">#BK${String(booking.id).padStart(3, '0')}</span>
+                  </div>
+                  <div>
+                    <strong>Status:</strong><br>
+                    <span class="status-badge ${statusClass}">${booking.status.toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <strong>Booking Date:</strong><br>
+                    ${bookingDate}<br>
+                    <small style="color: var(--text-light);">${bookingTime}</small>
+                  </div>
+                  <div>
+                    <strong>Created:</strong><br>
+                    ${createdDate}<br>
+                    <small style="color: var(--text-light);">${createdTime}</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Package Info Card -->
+              <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem;">
+                <h4 style="margin: 0 0 1rem 0; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fas fa-box"></i>
+                  Package Information
+                </h4>
+                <div style="display: grid; gap: 1rem;">
+                  <div>
+                    <strong>Package:</strong><br>
+                    ${booking.package_title || 'N/A'}
+                  </div>
+                  <div>
+                    <strong>Price:</strong><br>
+                    <span style="color: var(--success); font-size: 1.1rem; font-weight: bold;">LKR ${parseFloat(booking.package_price || 0).toLocaleString()}</span>
+                  </div>
+                  ${booking.package_description ? `
+                    <div>
+                      <strong>Description:</strong><br>
+                      <div style="background: var(--bg); padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
+                        ${booking.package_description}
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Show action buttons
+          editBtn.style.display = 'inline-block';
+          deleteBtn.style.display = 'inline-block';
+          
+          // Set up button event handlers
+          editBtn.onclick = () => {
+            closeBookingDetailsModal();
+            editBookingStatus(booking.id, booking.status);
+          };
+          deleteBtn.onclick = () => {
+            if (confirm(`Are you sure you want to delete booking #BK${String(booking.id).padStart(3, '0')}?`)) {
+              deleteBooking(booking.id);
+              closeBookingDetailsModal();
+            }
+          };
+
+        } else {
+          content.innerHTML = `
+            <div class="text-center" style="padding: 2rem; color: var(--error);">
+              <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+              <div>${data.message || 'Failed to load booking details'}</div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading booking details:', error);
+        content.innerHTML = `
+          <div class="text-center" style="padding: 2rem; color: var(--error);">
+            <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <div>Failed to load booking details. Please try again.</div>
+          </div>
+        `;
+      }
     }
 
     function editBookingStatus(bookingId, currentStatus) {
