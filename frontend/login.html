@@ -145,6 +145,21 @@
       background: rgba(114, 28, 36, 0.7);
       border: 1px solid #f5c6cb;
     }
+    
+    /* Signup link styles */
+    .signup-link {
+      color: #63b3ed !important;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .signup-link:hover {
+      color: #4299e1 !important;
+      text-shadow: 0 0 8px rgba(99, 179, 237, 0.4);
+    }
+    
     @media (max-width: 500px) {
       .login-container {
         width: 95vw;
@@ -176,6 +191,14 @@
     </form>
     
     <div id="message" class="message" style="display:none;"></div>
+    
+    <!-- Sign up link -->
+    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+      <p style="color: rgba(255, 255, 255, 0.8); margin: 0 0 10px 0; font-size: 14px;">Don't have an account?</p>
+      <a href="signup.html" class="signup-link">
+        Create Account <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+      </a>
+    </div>
   </div>
   <script>
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
